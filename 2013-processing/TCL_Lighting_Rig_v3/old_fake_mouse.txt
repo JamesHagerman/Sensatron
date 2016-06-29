@@ -1,0 +1,108 @@
+Old fakemouse controls:
+
+
+//   // These draw the actual animation to the screen:
+//   if (patternIndex == 0) {
+//     if (gyroOkay) {
+//       aCircle.draw(gyroInput.rawX, gyroInput.rawY);
+//     } else {
+      
+//      fakeMouseX += 10;
+//      if (fakeMouseX >= width) {
+//        fakeMouseX = 0;
+//      }
+//      fakeMouseY += (1 * direction);
+//      if (fakeMouseY >= 360 || fakeMouseY <= 0) {
+//        direction = direction * -1;
+//        fakeMouseY += (1 * direction);
+//      }
+     
+//       aCircle.draw(fakeMouseX, fakeMouseY);
+//     }
+//     aCircle.updateScreen();
+//     imageToLights.stripRawColors(aCircle.pg); // Move the animation data directly to the lights
+    
+//   }
+
+//   if (patternIndex == 1) {
+//      // Update the the fake mouse movement
+     
+//      fakeMouseX += (5 * direction2);
+//      if (fakeMouseX >= width || fakeMouseX <= 0) {
+//        direction2 = direction2 * -1;
+//        fakeMouseX += (1 * direction2);
+//      }
+//      fakeMouseY += (1 * direction);
+//      if (fakeMouseY >= 360 || fakeMouseY <= 0) {
+//        direction = direction * -1;
+//        fakeMouseY += (1 * direction);
+//      }
+     
+//     if (gyroOkay) {
+//       originalCircles.draw(gyroInput.rawX, gyroInput.rawY);
+//     } else {
+//       originalCircles.draw(fakeMouseX, fakeMouseY);
+// //      originalCircles.draw(mouseX, mouseY);
+//     }
+//     originalCircles.updateScreen();
+//     imageToLights.stripRawColors(originalCircles.pg); // Move the animation data directly to the lights
+    
+//   } 
+
+//   if (patternIndex == 2) {
+//     if (gyroOkay) {
+//       // Update the the fake mouse movement
+//        fakeMouseY += 1 + int(map(gyroInput.rawY, 0, width, 0, 5));
+//        if (fakeMouseY >= 180) {
+//          fakeMouseY = 0;
+//        }
+     
+//       spin.draw(fakeMouseY, fakeMouseY);
+//     } else {
+      
+//       // Update the the fake mouse movement
+//      fakeMouseX += 10;
+//      if (fakeMouseX >= width) {
+//        fakeMouseX = 0;
+//      }
+//      fakeMouseY += 10;
+//      if (fakeMouseY >= 180) {
+//        fakeMouseY = -0;
+//      }
+     
+//       spin.draw(fakeMouseY, fakeMouseX);
+//     }
+    
+//     spin.updateScreen();
+//     imageToLights.stripRawColors(spin.pg);
+    
+    
+//   }
+
+//   if (patternIndex == 3) {
+//     if (gyroOkay) {
+//       // Update the the fake mouse movement
+//        fakeMouseY += 1+ int(map(gyroInput.rawY, 0, width, 0, 5));
+//        if (fakeMouseY >= 180) {
+//          fakeMouseY = 0;
+//        }
+     
+//       multiSpin.draw(fakeMouseY, fakeMouseY);
+//     } else {
+      
+//       // Update the the fake mouse movement
+// //     fakeMouseX += 10;
+// //     if (fakeMouseX >= width) {
+// //       fakeMouseX = 0;
+// //     }
+//      fakeMouseY += 1;
+//      if (fakeMouseY >= 180) {
+//        fakeMouseY = -0;
+//      }
+     
+//       multiSpin.draw(fakeMouseY, mouseY);
+//     }
+    
+//     multiSpin.updateScreen();
+//     imageToLights.stripRawColors(multiSpin.pg);
+//   }

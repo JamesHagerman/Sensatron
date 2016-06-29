@@ -1,0 +1,64 @@
+Sensatron 5000 User's Manual
+
+Software UI
+
+The Sensatron 5000 user interface is run in a program called Processing.  There should be a shortcut called "Sensatron 5000" on the desktop; the icon is a white letter P on a dark blue background.  If you're starting up Processing for the first time (by double-clicking the icon), you may need to first load the Sensatron5000 project.  Select File->Load from the menu, or click the up arrow button near the top of the window, and select Sensatron5000.  You'll see the source code for the interface.  
+
+There are a few parameters near the top of the source code that you may wish to modify:
+
+CONNECT_TO_TRIKLITS: false means the software won't attempt to communicate with the lights.  Change 'false' to 'true' to control the lights.  If the computer's not connected to the controller, it's best to set this to false.
+
+STRANDS: Set the number of light strands.  There's no harm in having this set higher than the actual number of strands plugged into the controller.
+
+STRAND_LENGTH: Set the number of lights per strand (not likely to change).
+
+minOctave: This is the lowest frequency in Hz sensed by the Sensatron.
+
+bandsPerOctave: Each octave sensed by the Sensatron will be split into this many bands for display (in symmetrical mode; twice as many for non-symmetrical mode; these modes are described below).
+
+The last two above can be used to adjust the range of frequencies sensed by the Sensatron.  For example, setting minOctave to 800 and bandsPerOctave to 3 would cause the Sensatron to display just a two-octave range starting a couple of octaves above middle C.  The default settings display a 6-octave range on 12 strands, centered somewhere near middle C.
+
+Once you're ready to start the software, click the Play button (circle with a triangle pointing right) or select Sketch->Run from the menu to start the interface.
+
+The interface has a display on the left and controls on the right.
+
+The display shows a representation of the Sensatron's light strands, with the back of the sensatron at the bottom of the screen and the front at the top.  As long as each light strand is set to the proper mode (allowing it to be controlled by the computer), everything that happens in the display also happens simultaneously on the Sensatron.
+
+The control section lets you change several aspects of the way the Sensatron reacts to sound.  Each control is labeled, and each label has one letter in square brackets.  The letter in brackets is the keyboard shortcut for that control.  For buttons and checkboxes, pressing the shortcut key is the same as clicking the control.  For sliders, pressing the key selects the control, and the up/down or left/right arrows move the slider.  To deselect the slider, press Enter or use another control.
+
+List of Controls:
+
+Reset button (shortcut 'r'): Resets the maximum sound levels.  This is useful if the Sensatron was recently in a very loud environment, and you'd like it to pick up softer sounds now.
+
+Tween Up Rate slider ('u'): Controls how quickly each light changes from a dimmer color to a brighter color.  All the way to the right means changes are instantaneous.  All the way to the left means lights will never get brighter.
+
+Tween Down Rate slider ('d'): Controls how quickly each light changes from a brighter color to a dimmer one.  See above.  Together, these sliders control how smoothly the Sensatron reacts to changing levels.
+
+Full/Split mode ('f'): Toggles split mode or full mode.  In full mode, each entire strand displays the intensity of a single frequency band.  In split mode, the central portion of the display, above the Sensatron, is separate from the outer portion of the display, which hangs down around the Sensatron.
+
+Invert Full/Side ('i'): Flips the display upside-down in full mode, or flips the display on the sides of the Sensatron in split mode.
+
+Invert Top ('I'): Flips the display on the top of the Sensatron in split mode.
+
+Symmetry on/off ('s'): Changes between normal and symmetrical modes.  In normal mode, the Sensatron will display a frequency band for each light strand, starting with the lowest frequency band at the back of the Sensatron and going all the way around the circle so that the highest frequency band is also in the back.  In symmetrical mode, the Sensatron will display half as many bands, and they will be mirrored in two possible ways (see below).
+
+Symmetry Type ('S'): Switches between lateral and radial symmetry.  When this control is unchecked, lateral symmetry will cause the left and right sides of the Sensatron to mirror each other.  The lowest frequency band will be in the back, and the highest will be in the front.  When checked, radial symmetry will cause each strand to be mirrored by the one opposite it across the circle.  The frequency bands will go from lowest in the back, around the circle to the highest band in the front-left, and then repeating with the lowest again in the front, and the highest in the back-right.
+
+Color mode for side/full display ('c'):  Switches between a standard equalizer display (red-yellow-green), and a variable color one.  Controls the full display, or the side display in split mode.
+
+Color mode for top ('C'): See above; controls the top display in split mode.
+
+Red ('R'), Green ('G') and Blue ('B') Color Sliders:  These sliders allow you to select a color to use in the Color Mode displays mentioned above (selected with c or shift-c).  As you move the sliders, the square on the right will change to match the color you've created.  To use the color, click on one of the four Color buttons above the sliders, or use the number keys 1-4.  If you don't see these buttons, you may not be in Color Mode.
+
+Color Buttons 1-4:  These buttons allow you to set the color you've created using the sliders as one of the colors used by Color Mode.  Colors 1 and 2 are the two colors used by the Full or Side displays, and Colors 3 and 4 are used by the Top display (in split mode).
+
+Randomize Colors ('z'):  Check this box to have the Sensatron randomly change the colors used in Color Mode over time.
+
+Volatility slider ('v'):  Affect how quickly the colors will change when randomized.  If set to 0, the colors will not change, while setting the slider to 50 will cause the colors to change fairly quickly.
+
+
+
+Hardware
+
+Connect the computer to the Triknet controller using a crossover ethernet cable.  Connect the controller to each light strand using a phone cord (RJ11 connector).  Power on each light strand, and use the buttons on the strand's box to cycle through the test patterns until you find one with only three lights illuminated in red, green, and blue.  This is the mode that will allow the controller to control the strand.  Next, power on the controller.  Finally, start the Sensatron5000 Software as described above.
+

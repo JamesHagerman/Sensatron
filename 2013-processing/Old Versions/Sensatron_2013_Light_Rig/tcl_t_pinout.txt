@@ -1,0 +1,79 @@
+pinout of t-connector:
+
+male pins --------- female pins
+			  |
+			  |
+			  ts power in
+			
+			
+ts power in:
+tip: +5v
+sleeve: ground (0v)
+
+d = white(my green) = data = tx  = 11
+c = green(my yellow) = clock = cts = 13
+
+male pins:
+  |
+ c g
+ + d
+
+female pins: 
+  |
+ g c 
+ d +
+
+All are straight through...
+
+
+FTDI hack:
+g = ground
+c = clock
++ = positive 5 volts
+d = data
+nc = not connected
+nc = not connected
+
+2 pins are not connected.
+
+|	|	|	|	|	|
+g	c	+	d
+
+To LOAD and UNLOAD FTDI bitbang mode, use the Makefile included with PaintYourDragon's TCL processing library. It's here:
+/Volumes/Keket/Users/jamis/Desktop/my_root/Development/Circuits_MPUs/FTDI\ Hacks/TCL\ Lights/p9813/
+
+Enable bitbang mode:
+make unload
+
+Disable bitbang mode (and switch the ftdi driver back to normal serial mode):
+make load
+
+
+Bus Pirate:
+Using bus pirate to send commands to these lights shouldnt be too hard:
+We need to calculate the flog though. Flag code from tcl library:
+
+byte TclClass::makeFlag(byte red, byte green, byte blue) {
+  byte flag = 0;
+
+  flag = (red&0xC0)>>6;  // (0xff & 0xC0) >> 6 = 0b1111 1111 & 0b1100 0000 >> 6 = 0b1100 0000 >>6 = 0b0000 0011
+	// flag = 0b0000 0011  at this point if red is 0xff
+  flag = flag | ((green&0xC0)>>4); // 0b0000 0011 | ((0b0000 0000 & 0b1100 0000) >> 4) = 0b0000 0011 | ((0b0000 0000) >> 4) = 0b0000 0011
+	// flag = 0b0000 0011 at this point if green is 0x00 and red is 0xff
+  flag = flag | ((blue&0xC0)>>2); // same as last time... since blue is 0x00 also
+	// flag = 0b0000 0011 at this point if green is 0x00 and red is 0xff
+  return ~flag; // inversion! so 0b0000 0011 goes to 0b1111 1100  =  0xfc
+
+}
+
+// Warning! order is BLUE, GREEN, RED!!!!!
+
+empty frame:    0x00, 0x00, 0x00, 0x00
+flag and color: 0xfc, 0x00, 0x00, 0xff    
+empty frame:    0x00, 0x00, 0x00, 0x00
+
+[0x00,0x00,0x00,0x00 0xfc,0x00,0x00,0xff 0xfc,0x00,0x00,0xff 0x00,0x00,0x00,0x00]
+
+
+
+
