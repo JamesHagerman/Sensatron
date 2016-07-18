@@ -34,14 +34,29 @@ short TC_FTDI_DCD = 0x40;  /* Avail on full breakout board */
 short TC_FTDI_RI  = 0x80;  /* Avail on full breakout board */
 
 TotalControl tc;
-int          STRANDS        = 1,
-             STRAND_LENGTH = 50;
-int[]        p               = new int[STRANDS * STRAND_LENGTH];
-int[] remap;
+
+int STRANDS = 12; // Number of physical wands
+int STRAND_LENGTH = 50; // Number of lights per strand
+int LED_COUNT = STRAND_LENGTH; // Total number of lights
+
+int strandCount = STRANDS/2; // two wands per "strand" of output
+int pixelsOnStrand = STRAND_LENGTH*2; // twice as many pixels per "strand" 
+int totalPixels = strandCount * pixelsOnStrand;
+
+int[] p = new int[totalPixels];
+int[] remap = new int[totalPixels];
 /* Could also use PImage and loadPixels()/updatePixels()...many options! */
+
+// A place to display the lights:
+PGraphics lightDisplay;
+double dRad = (Math.PI*2)/STRANDS;
+int[][] lights = new int[STRANDS][STRAND_LENGTH];
+int SPACING = 5;
 
 void setup() 
 {
+  size(800, 600, P3D); // make it a little smaller...
+  frameRate(60);
   
   // Override the default pin outs:
   // This is clock. We don't want to override it:
@@ -56,7 +71,7 @@ void setup()
   tc.setStrandPin(5,TC_FTDI_DSR);
   tc.setStrandPin(6,TC_FTDI_DCD);
   
-  int status = tc.open(STRANDS, STRAND_LENGTH);
+  int status = tc.open(strandCount, pixelsOnStrand);
   if(status != 0) {
     tc.printError(status);
     exit();
@@ -65,21 +80,30 @@ void setup()
   // This will build the Remapping array that will
   // wrap the LED strands back on themselves for 
   // the higher density the Sensatron loves so much:
-  remap = new int[STRANDS * STRAND_LENGTH];
   buildRemapArray();
+  
+  // Build the visualizer:
+  lightDisplay = createGraphics(800, 600, P3D);
+  lightDisplay.smooth();
+  lightDisplay.lights();
 }
 
 void draw()
 {
+  background(150);
+  setAllLights(getRandomColor());
+  drawLights();
+  mapDrawingToLights();
+  
   // Set some random pixel to full white:
-  int x = (int)random(STRANDS * STRAND_LENGTH);
-  p[x]  = 0x00ffffff;
+  //int x = (int)random(totalPixels);
+  //p[x]  = 0x00ffffff;
   
   // Draw the p array to the lights using the remap function:
   tc.refresh(p, remap); 
   
   // Set the random pixel back to black for the next pass:
-  p[x]  = 0;
+  //p[x]  = 0;
 }
 
 void exit()
@@ -121,4 +145,73 @@ public void buildRemapArray() {
   }
   
   println("Done building remap array.");
+}
+
+// Random color generator:
+color getRandomColor() {
+  return color((int)random(255), (int)random(255), (int)random(255));
+}
+
+// Setting all lights to some color:
+void setAllLights(color c) {
+  for (int strand = 0; strand < STRANDS; strand++) {
+    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+      lights[strand][lightNum] = c;
+    }
+  }
+}
+
+// Method to move colors from the lights[][] multi-dimensional array
+// and to the lights array: p[]
+void mapDrawingToLights() {
+  int lightIndex = 0;
+  for (int strand = 0; strand < STRANDS; strand++) {
+    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+      p[lightIndex] = lights[strand][lightNum];
+      lightIndex++;
+    }
+  }
+}
+
+// A method for actually drawing the lights:
+void drawLights() {
+  int centerX = lightDisplay.width/2;
+  int centerY = lightDisplay.height/2;
+  
+  lightDisplay.beginDraw();
+  lightDisplay.background(100);
+  lightDisplay.pushMatrix();
+  //  rotateZ(radians(180));
+  lightDisplay.translate(0, 0, -100);
+  lightDisplay.rotateX(radians(45));
+
+  for (int strand = 0; strand < STRANDS; strand++) {
+    double theta = strand * dRad - (PI/2) + PI;
+    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+      int c = lights[strand][lightNum];
+//      c = 255;
+      lightDisplay.fill(c);
+//      noStroke();
+      int y = (int) ((lightNum+3) * SPACING * Math.sin(theta));
+      int x = (int) ((lightNum+3) * SPACING * Math.cos(theta));
+      x = centerX - x;
+      y = centerY - y;
+      lightDisplay.ellipse(x, y, 5, 5);
+    }
+    // Draw the wand labels
+    lightDisplay.fill(255);
+    int y = (int) ((STRAND_LENGTH+3) * SPACING * Math.sin(theta));
+    int x = (int) ((STRAND_LENGTH+3) * SPACING * Math.cos(theta));
+    x = centerX - x;
+    y = centerY - y;
+    lightDisplay.text(strand, x, y, 10);
+  }
+
+  lightDisplay.popMatrix();
+  lightDisplay.endDraw();
+  image(lightDisplay, 0, 0);
+  
+  // Move this information to the physical lights:
+  //mapDrawingToLights();
+  //sendLights();
 }
