@@ -5,6 +5,12 @@ var app = express();
 app.use(express.static('public'));
 
 app.get('/currentAnimation/:id', function (req, res) {
+
+	// To "activate"/hit this endpoint after starting the server, 
+	// open this page in your browser:
+	//
+	// http://theserverip-address:3000/currentAnimation/10
+
 	var currentAnimation = req.params.id;
 	// switchAnimation(currentAnimation);
 	console.log('Switching animation to: ', currentAnimation);
