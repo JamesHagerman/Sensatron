@@ -5,7 +5,7 @@ var app = express();
 app.use(express.static('public'));
 
 app.get('/currentAnimation/:id', function (req, res) {
-	var currentAnimation = req.id;
+	var currentAnimation = req.params.id;
 	// switchAnimation(currentAnimation);
 	console.log('Switching animation to: ', currentAnimation);
   	res.status(200).send('Hello world!');
