@@ -20,7 +20,8 @@
  *   modprobe ftdi_sio
  *   modprobe usbserial
  */
-
+  
+import processing.net.*;
 import TotalControl.*;
 
 // The TotalControl processing library doesn't define the FTDI pins so we do:
