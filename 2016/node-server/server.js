@@ -145,11 +145,11 @@ function updateAnimationServer(newData) {
 	// Jacob knows of a better way to communicate
 	// from a server directly to Processing.
 
-	console.log('Updating the Animation Server...', newData);
+	// console.log('Updating the Animation Server...', newData);
 
 	// TODO: At some point, this will NOT be the raw color server!
 	if (rawColorClientConnected) {
-		console.log('Writing data to server...', newData);
+		// console.log('Writing data to server...', newData);
 
 		var encodedString = '';
 
@@ -160,7 +160,7 @@ function updateAnimationServer(newData) {
 			var green = String.fromCharCode(newData.g);
 			var blue = String.fromCharCode(newData.b);
 
-			console.log('rgb: ', red, green, blue);
+			// console.log('rgb: ', red, green, blue);
 
 			encodedString += red;
 			encodedString += green;
@@ -176,7 +176,7 @@ function updateAnimationServer(newData) {
 		// }
 
 		len = buf.write(encodedString, 0, bufferSize, 'binary');
-		console.log('Octets written : '+  len);
+		// console.log('Octets written : '+  len);
 		rawColorClient.write(buf);
 	} else {
 		connectToRawColorServer();

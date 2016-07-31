@@ -28,11 +28,11 @@ $(document).ready(function() {
     // console.log('mousemove event: ', x, y, hue, val);
 
     var color = Color.HSVtoRGB(xscale, 1, yscale);
-    console.log('color: ', color, Color.getCSSColor());
+    // console.log('color: ', color, Color.getCSSColor());
     $('.canvas').css('background-color', Color.getCSSColor());
 
     socket.emit('color', {r: color[0], g: color[1], b: color[2]});
-    $('.canvas').off('mousemove');
+    // $('.canvas').off('mousemove');
   })
 });
 

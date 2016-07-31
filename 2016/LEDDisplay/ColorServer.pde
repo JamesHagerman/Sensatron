@@ -18,21 +18,25 @@ class ColorServer {
     if (thisClient !=null) {
       byte[] colorBytes = new byte[bufferSize];
       int byteCount = thisClient.readBytes(colorBytes);
-      println("byteCount: " + byteCount);
+      //println("byteCount: " + byteCount);
       if (byteCount > 0) {
         // String myString = new String(colorBytes);
         // println(myString);
-        for (int i = 0, j = 0; i < bufferSize; i+=3, j++) {
-          print("i: " + i +" j: " + j);
-          byte red = colorBytes[i];
-          byte green = colorBytes[i+1];
-          byte blue = colorBytes[i+2];
+        int j = 0;
+        int red = 0, green = 0, blue = 0;
+        for (int i = 0; i < byteCount; i+=3) {
+          //print("i: " + i +" j: " + j);
+          red = colorBytes[i] + 127;
+          green = colorBytes[i+1] + 127;
+          blue = colorBytes[i+2] + 127;
 
-          println(" r: "+(int)red+" g: "+(int)green+" b: "+(int)blue);
+          //println(" r: "+(int)red+" g: "+(int)green+" b: "+(int)blue);
 
           color theColor = color((int)red, (int)green, (int)blue);
           p[j] = theColor;
+          j++;
         }
+        println(" r: "+(int)red+" g: "+(int)green+" b: "+(int)blue);
       }
 
     }
