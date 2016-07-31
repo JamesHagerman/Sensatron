@@ -44,20 +44,9 @@ void draw()
   background(150);
 
   // Get color data from a connected client:
-  colorServer.getColors();
-
-  setAllLights(getRandomColor());
-
-  // Set some random pixel to full white:
-  //int x = (int)random(totalPixels);
-  //p[x]  = 0x00ffffff;
-
-  // Draw the lights to the LED Display
+  colorServer.getColors(p);
+  mapLightsToDrawing();
   drawLights();
-  mapDrawingToLights();
-
-  // Set the random pixel back to black for the next pass:
-  //p[x]  = 0;
 }
 
 public void buildRemapArray() {
@@ -89,23 +78,10 @@ public void buildRemapArray() {
   println("Done building remap array.");
 }
 
-// Random color generator:
-color getRandomColor() {
-  return color((int)random(255), (int)random(255), (int)random(255));
-}
-
-// Setting all lights to some color:
-void setAllLights(color c) {
-  for (int strand = 0; strand < STRANDS; strand++) {
-    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
-      lights[strand][lightNum] = c;
-    }
-  }
-}
-
 // Method to move colors from the lights[][] multi-dimensional array
 // and to the lights array: p[]
 void mapDrawingToLights() {
+  // Lights on each strand to one big array
   int lightIndex = 0;
   for (int strand = 0; strand < STRANDS; strand++) {
     for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
@@ -116,8 +92,15 @@ void mapDrawingToLights() {
 }
 
 void mapLightsToDrawing() {
-  // TODO: Build this function so we can hand raw byte streams through to this
-  // server and still display the lights in the lighting display.
+  // One big array to lights on each strand
+  int lightIndex = 0;
+  for (int strand = 0; strand < STRANDS; strand++) {
+    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+      lights[strand][lightNum] = p[lightIndex];
+      lightIndex++;
+    }
+  }
+
 }
 
 // A method for actually drawing the lights:
@@ -130,7 +113,7 @@ void drawLights() {
   lightDisplay.pushMatrix();
   //  rotateZ(radians(180));
   lightDisplay.translate(0, 0, -100);
-  lightDisplay.rotateX(radians(45));
+  // lightDisplay.rotateX(radians(45));
 
   for (int strand = 0; strand < STRANDS; strand++) {
     double theta = strand * dRad - (PI/2) + PI;
@@ -138,7 +121,7 @@ void drawLights() {
       int c = lights[strand][lightNum];
 //      c = 255;
       lightDisplay.fill(c);
-//      noStroke();
+     noStroke();
       int y = (int) ((lightNum+3) * SPACING * Math.sin(theta));
       int x = (int) ((lightNum+3) * SPACING * Math.cos(theta));
       x = centerX - x;
