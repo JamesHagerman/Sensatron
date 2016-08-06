@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Sensatron</title>
+
+<script src="js/jquery-3.1.0.min.js"></script>
+<script>
+SERVICE_URL = 'rs/lights'
+
+function updateLights(params) {
+	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
+}
+
+function toggle() {
+	updateLights({toggle: 'true'});
+}
+
+function lightParamsCallback(settingsJSON) {
+	var settings = JSON.parse(settingsJSON);
+	$('#lightsOn').text(settings.on ? 'on' : 'off');
+}
+
+</script>
+</head>
+<body>
+<p>Lights are <span id="lightsOn"></span></p>
+<button onclick="toggle()">Toggle Lights</button>
+<script>
+updateLights({});
+</script>
+</body>
+</html>
