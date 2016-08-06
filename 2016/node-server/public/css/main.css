@@ -1,3 +1,5 @@
+/*! HTML5 Boilerplate v5.3.0 | MIT License | https://html5boilerplate.com/ */
+
 /*
  * What follows is the result of much research on cross-browser styling.
  * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
@@ -21,6 +23,11 @@ html {
  * These selection rule sets have to be separate.
  * Customize the background color to match your design.
  */
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
 
 ::selection {
     background: #b3d4fc;
@@ -88,8 +95,19 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+.content,
+.canvas {
+  width: 100%;
+  height: 100%;
+}
 
+.htmlContent {
+  position: absolute;
+}
 
+.canvas {
+   position: absolute;
+}
 
 
 
@@ -189,6 +207,7 @@ textarea {
 }
 
 @media print,
+       (-webkit-min-device-pixel-ratio: 1.25),
        (min-resolution: 1.25dppx),
        (min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
