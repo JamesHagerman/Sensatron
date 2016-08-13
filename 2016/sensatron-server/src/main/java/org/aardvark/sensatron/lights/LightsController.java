@@ -68,7 +68,7 @@ public class LightsController implements Runnable {
 			exit();
 		  }
 		} catch (UnsatisfiedLinkError e) {
-			log.error("Couldn't find TCL native library");
+			log.error("Couldn't find TCL native library. " + e);
 		}
 	}
 	
