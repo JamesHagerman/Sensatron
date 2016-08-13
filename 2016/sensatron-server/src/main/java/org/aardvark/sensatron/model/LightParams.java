@@ -1,6 +1,6 @@
 package org.aardvark.sensatron.model;
 
-public class LightParams {
+public class LightParams implements Cloneable {
 	
 	private boolean on;
 
@@ -14,7 +14,11 @@ public class LightParams {
 
 	@Override
 	public String toString() {
-		return "LightParams [on=" + on + "]";
+		return super.toString() + " [on=" + on + "]";
 	}
 
+	@Override
+	public LightParams clone() throws CloneNotSupportedException {
+		return (LightParams) super.clone();
+	}
 }

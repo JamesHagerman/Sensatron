@@ -93,6 +93,7 @@ public class LightsController implements Runnable {
 
 	void draw(LightParams p)
 	{
+		log.trace("Drawing using params: " + p);
 		if (p.isOn()) {
 			log.trace("Turning lights on");
 			setAllLights(color(255,255,255));
@@ -190,7 +191,12 @@ public class LightsController implements Runnable {
 	}
 
 	public LightParams getParams() {
-		return params;
+		try {
+			return params.clone();
+		} catch (CloneNotSupportedException e) {
+			log.error(e.toString() + " -- returning our own params object");
+			return params;
+		}
 	}
 
 	public void setParams(LightParams params) {
