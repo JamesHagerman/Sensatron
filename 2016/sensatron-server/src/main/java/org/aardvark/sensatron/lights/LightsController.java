@@ -8,6 +8,8 @@ import TotalControl.TotalControl;
 public class LightsController implements Runnable {
 
 	private final Thread renderThread = new Thread(this);
+	
+	private boolean tcl = false; // Are we actually controlling the lights?
 	private boolean stopping = false;
 	private LightParams params = new LightParams();
 	private static Logger log = Logger.getLogger(LightsController.class); 
@@ -61,15 +63,15 @@ public class LightsController implements Runnable {
 		  
 		  int status = TotalControl.open(strandCount, pixelsOnStrand);
 		  if(status == 0) {
-			renderThread.start();
+			  tcl = true;
 		  } else {
 			TotalControl.printError(status);
 			log.error("Couldn't open connection to TCL light array.");
-			exit();
 		  }
 		} catch (UnsatisfiedLinkError e) {
 			log.error("Couldn't find TCL native library. " + e);
 		}
+		renderThread.start();
 	}
 	
 	public void run() {
@@ -93,7 +95,6 @@ public class LightsController implements Runnable {
 
 	void draw(LightParams p)
 	{
-		log.trace("Drawing using params: " + p);
 		if (p.isOn()) {
 			log.trace("Turning lights on");
 			setAllLights(color(255,255,255));
@@ -108,7 +109,9 @@ public class LightsController implements Runnable {
 	  //p[x]  = 0x00ffffff;
 	  
 	  // Draw the p array to the lights using the remap function:
-	  TotalControl.refresh(pixels, remap); 
+	  if (tcl) {
+		  TotalControl.refresh(pixels, remap);
+	  }
 	  
 	  // Set the random pixel back to black for the next pass:
 	  //p[x]  = 0;
@@ -204,4 +207,8 @@ public class LightsController implements Runnable {
 		this.params = params;
 	}
 
+	public boolean isTCLConnected() {
+		return tcl;
+	}
+	
 }
