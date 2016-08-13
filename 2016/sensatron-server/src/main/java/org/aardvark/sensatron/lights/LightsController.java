@@ -10,8 +10,8 @@ public class LightsController implements Runnable {
 	private final Thread renderThread = new Thread(this);
 	private boolean stopping = false;
 	private LightParams params = new LightParams();
-	private static Logger log = Logger.getLogger(LightsController.class); 
-	
+	private static Logger log = Logger.getLogger(LightsController.class);
+
 	// The TotalControl processing library doesn't define the FTDI pins so we do:
 	short TC_FTDI_TX  = 0x01;  /* Avail on all FTDI adapters,  strand 0 default */
 	short TC_FTDI_RX  = 0x02;  /* Avail on all FTDI adapters,  strand 1 default */
@@ -27,7 +27,7 @@ public class LightsController implements Runnable {
 	int LED_COUNT = STRAND_LENGTH; // Total number of lights
 
 	int strandCount = STRANDS/2; // two wands per "strand" of output
-	int pixelsOnStrand = STRAND_LENGTH*2; // twice as many pixels per "strand" 
+	int pixelsOnStrand = STRAND_LENGTH*2; // twice as many pixels per "strand"
 	int totalPixels = strandCount * pixelsOnStrand;
 
 	int[] pixels = new int[totalPixels];
@@ -37,28 +37,28 @@ public class LightsController implements Runnable {
 	int[][] lights = new int[STRANDS][STRAND_LENGTH];
 	int SPACING = 5;
 
-	void setup() 
+	void setup()
 	{
-	  
+
 		try {
 		  // This will build the Remapping array that will
-		  // wrap the LED strands back on themselves for 
+		  // wrap the LED strands back on themselves for
 		  // the higher density the Sensatron loves so much:
 		  buildRemapArray();
-			  
+
 		  // Override the default pin outs:
 		  // This is clock. We don't want to override it:
 		  //tc.setStrandPin(x,TC_FTDI_CTS);
 		  TotalControl.setStrandPin(0,TC_FTDI_TX); // default
 		  TotalControl.setStrandPin(1,TC_FTDI_RX); // default
 		  TotalControl.setStrandPin(2,TC_FTDI_DTR); // spliting dtr and rts
-		  
+
 		  // Custom lines for the ftdi breakout
 		  TotalControl.setStrandPin(3,TC_FTDI_RTS);
 		  TotalControl.setStrandPin(4,TC_FTDI_RI);
 		  TotalControl.setStrandPin(5,TC_FTDI_DSR);
 		  TotalControl.setStrandPin(6,TC_FTDI_DCD);
-		  
+
 		  int status = TotalControl.open(strandCount, pixelsOnStrand);
 		  if(status == 0) {
 			renderThread.start();
@@ -71,21 +71,21 @@ public class LightsController implements Runnable {
 			log.error("Couldn't find TCL native library. " + e);
 		}
 	}
-	
+
 	public void run() {
 		log.info("Render thread started.");
 		while (!stopping) {
 			// Use the same LightParams throughout the rendering process, even if a new one is passed in
 			LightParams p = params;
 			draw(p);
-			
+
 			try {
 				Thread.sleep(33);
 			} catch (InterruptedException ignore) {}
 		}
 		log.info("Render thread stopped.");
 	}
-	
+
 	public void stop() {
 		log.info("Stopping render thread...");
 		stopping = true;
@@ -101,14 +101,14 @@ public class LightsController implements Runnable {
 			setAllLights(0);
 		}
 	  mapDrawingToLights();
-	  
+
 	  // Set some random pixel to full white:
 	  //int x = (int)random(totalPixels);
 	  //p[x]  = 0x00ffffff;
-	  
+
 	  // Draw the p array to the lights using the remap function:
-	  TotalControl.refresh(pixels, remap); 
-	  
+	  TotalControl.refresh(pixels, remap);
+
 	  // Set the random pixel back to black for the next pass:
 	  //p[x]  = 0;
 	}
@@ -151,7 +151,7 @@ public class LightsController implements Runnable {
 	      index += 1;
 	    }
 	  }
-	  
+
 	  log.debug("Done building remap array.");
 	}
 
@@ -180,11 +180,11 @@ public class LightsController implements Runnable {
 	    }
 	  }
 	}
-	
+
 	public int color(int red, int green, int blue) {
-		return red << 16 + green << 8 + blue;
+		return red << 16 | green << 8 | blue;
 	}
-	
+
 	public int random(int max) {
 		return (int) (Math.random() * (max + 1));
 	}
