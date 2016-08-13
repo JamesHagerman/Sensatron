@@ -14,7 +14,7 @@ public class LightParams implements Cloneable {
 
 	@Override
 	public String toString() {
-		return super.toString() + " [on=" + on + "]";
+		return "LightParams [on=" + on + "]";
 	}
 
 	@Override
