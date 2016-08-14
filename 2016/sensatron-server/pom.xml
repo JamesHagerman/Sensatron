@@ -57,6 +57,20 @@
 	    <systemPath>${project.basedir}/src/main/resources/TotalControl.jar</systemPath>
 	</dependency>
 	<dependency>
+	    <groupId>ddf.minim</groupId>
+	    <artifactId>minim</artifactId>
+	    <version>2.2.2</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/src/main/resources/minim.jar</systemPath>
+	</dependency>
+	<dependency>
+	    <groupId>ddf.minim</groupId>
+	    <artifactId>jsminim</artifactId>
+	    <version>2.2.2</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/src/main/resources/jsminim.jar</systemPath>
+	</dependency>
+	<dependency>
 	  <groupId>log4j</groupId>
 	  <artifactId>log4j</artifactId>
 	  <version>1.2.13</version>

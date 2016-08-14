@@ -12,5 +12,9 @@
         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 	<context:component-scan base-package="org.aardvark.sensatron.controller" />
 	<mvc:annotation-driven />
-	<bean id="lightsController" class="org.aardvark.sensatron.lights.LightsController" init-method="setup" scope="singleton" destroy-method="exit" ></bean>
+	
+	<bean id="lightsController" class="org.aardvark.sensatron.lights.LightsController" init-method="setup" scope="singleton" destroy-method="exit" >
+		<property name="mediaPath" value="" />
+	</bean>
+	
 </beans>

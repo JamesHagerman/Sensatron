@@ -1,13 +1,21 @@
 package org.aardvark.sensatron.lights;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import org.aardvark.sensatron.model.LightParams;
 import org.apache.log4j.Logger;
 
 import TotalControl.TotalControl;
+import ddf.minim.Minim;
 
 public class LightsController implements Runnable {
 
 	private final Thread renderThread = new Thread(this);
+	private Minim minim;
+	private String mediaPath = "";
 
 	private boolean tcl = false; // Are we actually controlling the lights?
 	private boolean stopping = false;
@@ -41,6 +49,8 @@ public class LightsController implements Runnable {
 
 	void setup()
 	{
+		
+		minim = new Minim(this);
 
 		try {
 		  // This will build the Remapping array that will
@@ -212,4 +222,43 @@ public class LightsController implements Runnable {
 		return tcl;
 	}
 
+	
+	// Minim helper methods
+	
+	/**
+	 * The sketchPath method is expected to transform a filename into an absolute path and is used when attempting to create an AudioRecorder.
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public String sketchPath( String fileName ) {
+		return new File(mediaPath, fileName).getAbsolutePath();
+	}
+	
+	/**
+	 * The createInput method is used when loading files and is expected to take a filename, which is not necessarily an absolute path, 
+	 * and return an InputStream that can be used to read the file. For example, in Processing, the createInput method will search in 
+	 * the data folder, the sketch folder, handle URLs, and absolute paths. If you are using Minim outside of Processing, you can handle 
+	 * whatever cases are appropriate for your project.
+	 * 
+	 * @param fileName
+	 * @return
+	 * @throws FileNotFoundException 
+	 */
+	public InputStream createInput( String fileName ) throws FileNotFoundException {
+		try {
+			return new FileInputStream(new File(fileName));
+		} catch (FileNotFoundException e) {
+			log.debug(fileName + " doesn't seem to be an absolute path...");
+		}
+		return new FileInputStream(new File(mediaPath, fileName));
+	}
+
+	public String getMediaPath() {
+		return mediaPath;
+	}
+
+	public void setMediaPath(String mediaPath) {
+		this.mediaPath = mediaPath;
+	}
 }
