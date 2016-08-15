@@ -15,7 +15,7 @@ void setup() {
   minim = new Minim(this);
 
   // use the getLineIn method of the Minim object to get an AudioInput
-  in = minim.getLineIn();
+  in = minim.getLineIn(Minim.MONO, 128);
 
   // create an FFT object that has a time-domain buffer
   // the same size as jingle's sample buffer
@@ -46,7 +46,7 @@ void draw()
   for(int i = 0; i < fft.specSize(); i++)
   {
     // draw the line for frequency band i, scaling it up a bit so we can see it
-    line( i, height, i, height - fft.getBand(i)*8 );
+    line( i, height, i, height - fft.getBand(i) *8 );
   }
 }
 
