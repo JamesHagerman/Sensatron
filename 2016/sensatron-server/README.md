@@ -6,6 +6,29 @@ mvn jetty:run
 
 Then go to `http://localhost:8080` in your browser to see the control site!
 
+## Getting Audio passthrough working
+
+You've gotta modify the `sound.properties` file inside the Java directory structure. Sun got all bitchy about their pulseaudio support or something.
+
+Modify this file (Might be somewhere else on your box...):
+`/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/sound.properties`
+
+So it looks something like this:
+
+```
+#javax.sound.sampled.Clip=org.classpath.icedtea.pulseaudio.PulseAudioMixerProvider
+#javax.sound.sampled.Port=org.classpath.icedtea.pulseaudio.PulseAudioMixerProvider
+#javax.sound.sampled.SourceDataLine=org.classpath.icedtea.pulseaudio.PulseAudioMixerProvider
+#javax.sound.sampled.TargetDataLine=org.classpath.icedtea.pulseaudio.PulseAudioMixerProvider
+
+javax.sound.sampled.Clip=com.sun.media.sound.DirectAudioDeviceProvider
+javax.sound.sampled.Port=com.sun.media.sound.PortMixerProvider
+javax.sound.sampled.SourceDataLine=com.sun.media.sound.DirectAudioDeviceProvider
+javax.sound.sampled.TargetDataLine=com.sun.media.sound.DirectAudioDeviceProvider
+```
+
+And that should let Java and Minim just use the working PulseAudio version instead of mucking around with stupid libraries. Woo!
+
 ## Getting lights working:
 
 Before starting the server, make sure you've installed the correct libraries.

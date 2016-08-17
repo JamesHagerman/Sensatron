@@ -59,6 +59,10 @@ public class LightsController implements Runnable {
 			minim = new Minim(this);
 		  in = minim.getLineIn(Minim.STEREO, bufferSize);
 		  in.enableMonitoring();
+			fft = new FFT( in.bufferSize(), in.sampleRate() );
+			if (in.isMonitoring()) {
+				log.info("Audio should be monitoring...");
+			}
 		} catch(Exception e) {
 			log.error("Couldn't open audio? " + e);
 		}
@@ -116,13 +120,19 @@ public class LightsController implements Runnable {
 
 	void draw(LightParams p)
 	{
-		if (p.isOn()) {
-			log.trace("Turning lights on");
-			setAllLights(color(255,255,255));
-		} else {
-			log.trace("Turning lights off");
-			setAllLights(0);
-		}
+		// if (p.isOn()) {
+		// 	log.trace("Turning lights on");
+		// 	setAllLights(color(255,255,255));
+		// } else {
+		// 	log.trace("Turning lights off");
+		// 	setAllLights(0);
+		// }
+
+		fft.forward( in.mix );
+		int band = Math.round(fft.getBand(0));
+		// log.info("Band: " + band);
+		setAllLights(color(band, band, band));
+
 	  mapDrawingToLights();
 
 	  // Set some random pixel to full white:
