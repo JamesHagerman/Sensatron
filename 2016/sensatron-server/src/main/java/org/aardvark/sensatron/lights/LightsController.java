@@ -9,13 +9,18 @@ import org.aardvark.sensatron.model.LightParams;
 import org.apache.log4j.Logger;
 
 import TotalControl.TotalControl;
-import ddf.minim.Minim;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
 
 public class LightsController implements Runnable {
 
 	private final Thread renderThread = new Thread(this);
-	private Minim minim;
+	public Minim minim;
 	private String mediaPath = "";
+	public AudioInput in;
+	private FFT fft;
+	private FFT fftLog;
+	public int bufferSize = 2048;
 
 	private boolean tcl = false; // Are we actually controlling the lights?
 	private boolean stopping = false;
@@ -49,8 +54,14 @@ public class LightsController implements Runnable {
 
 	void setup()
 	{
-		
-		minim = new Minim(this);
+		log.info("SETUP!");
+		try {
+			minim = new Minim(this);
+		  in = minim.getLineIn(Minim.STEREO, bufferSize);
+		  in.enableMonitoring();
+		} catch(Exception e) {
+			log.error("Couldn't open audio? " + e);
+		}
 
 		try {
 		  // This will build the Remapping array that will
@@ -75,8 +86,8 @@ public class LightsController implements Runnable {
 		  if(status == 0) {
 			  tcl = true;
 		  } else {
-			TotalControl.printError(status);
-			log.error("Couldn't open connection to TCL light array.");
+				TotalControl.printError(status);
+				log.error("Couldn't open connection to TCL light array.");
 		  }
 		} catch (UnsatisfiedLinkError e) {
 			log.error("Couldn't find TCL native library. " + e);
@@ -222,28 +233,28 @@ public class LightsController implements Runnable {
 		return tcl;
 	}
 
-	
+
 	// Minim helper methods
-	
+
 	/**
 	 * The sketchPath method is expected to transform a filename into an absolute path and is used when attempting to create an AudioRecorder.
-	 * 
+	 *
 	 * @param fileName
 	 * @return
 	 */
 	public String sketchPath( String fileName ) {
 		return new File(mediaPath, fileName).getAbsolutePath();
 	}
-	
+
 	/**
-	 * The createInput method is used when loading files and is expected to take a filename, which is not necessarily an absolute path, 
-	 * and return an InputStream that can be used to read the file. For example, in Processing, the createInput method will search in 
-	 * the data folder, the sketch folder, handle URLs, and absolute paths. If you are using Minim outside of Processing, you can handle 
+	 * The createInput method is used when loading files and is expected to take a filename, which is not necessarily an absolute path,
+	 * and return an InputStream that can be used to read the file. For example, in Processing, the createInput method will search in
+	 * the data folder, the sketch folder, handle URLs, and absolute paths. If you are using Minim outside of Processing, you can handle
 	 * whatever cases are appropriate for your project.
-	 * 
+	 *
 	 * @param fileName
 	 * @return
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
 	public InputStream createInput( String fileName ) throws FileNotFoundException {
 		try {

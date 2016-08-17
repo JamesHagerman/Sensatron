@@ -37,7 +37,7 @@ import javax.swing.*;
 
         boolean useAmbientColor = false;
         int ambientColor = color(128, 128, 128);
-        
+
 
 
 
@@ -68,9 +68,9 @@ import javax.swing.*;
 	int WIDGET_1_Y = COLOR_PANEL_Y + 150;
 	int WIDGET_2_X = SIZE + DisplayControlWidget.WIDTH;
 	int WIDGET_2_Y = WIDGET_1_Y;
-	PButton resetButton = new PButton(this, SIZE, 20, 40, 20, "[r]eset", 
-            new ActionDelegate(){ 
-	      void doAction(InputEvent event){ 
+	PButton resetButton = new PButton(this, SIZE, 20, 40, 20, "[r]eset",
+            new ActionDelegate(){
+	      void doAction(InputEvent event){
                   Equalizer[] eqs = getEqualizers();
 	    	  for (int i = 0; i < eqs.length; i++) {
 	    		  eqs[i].resetMaxLevels();
@@ -84,26 +84,26 @@ import javax.swing.*;
 
 //	ACheckbox randomizeCheckbox = new ACheckbox(this, SIZE + COLOR_PANEL_X, COLOR_PANEL_Y + 125, 10, 10, "Randomi[z]e Colors", 'z');
 //	Slider volatilitySlider = new Slider(this, SIZE + COLOR_PANEL_X + 130, COLOR_PANEL_Y + 130, 50, 1);
-	
-	PButton saveDisplay1Button = new PButton(this, WIDGET_1_X + 20, WIDGET_1_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Save", 
+
+	PButton saveDisplay1Button = new PButton(this, WIDGET_1_X + 20, WIDGET_1_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Save",
 			new ActionDelegate() {
 		public void doAction(InputEvent event) {
 			saveDisplay1();
 		}
 	});
-	PButton loadDisplay1Button = new PButton(this, WIDGET_1_X + 120, WIDGET_1_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Load", 
+	PButton loadDisplay1Button = new PButton(this, WIDGET_1_X + 120, WIDGET_1_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Load",
 			new ActionDelegate() {
 			public void doAction(InputEvent event) {
 				loadDisplay1();
 			}
 		});
-	PButton saveDisplay2Button = new PButton(this, WIDGET_2_X + 20, WIDGET_2_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Save", 
+	PButton saveDisplay2Button = new PButton(this, WIDGET_2_X + 20, WIDGET_2_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Save",
 			new ActionDelegate() {
 		public void doAction(InputEvent event) {
 			saveDisplay2();
 		}
 	});
-	PButton loadDisplay2Button = new PButton(this, WIDGET_2_X + 120, WIDGET_2_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Load", 
+	PButton loadDisplay2Button = new PButton(this, WIDGET_2_X + 120, WIDGET_2_Y + DisplayControlWidget.HEIGHT + 20, 50, 20, "Load",
 			new ActionDelegate() {
 			public void doAction(InputEvent event) {
 				loadDisplay2();
@@ -129,10 +129,10 @@ import javax.swing.*;
 	LightDisplay sideDisplay = null;
 //	RainDisplay rainDisplay = null;
 //	OverlayDisplay rainEqDisplay = null;
-	
-	HashMap savedDisplays = 
-			new HashMap(); 
-	
+
+	HashMap savedDisplays =
+			new HashMap();
+
 	DisplayControlWidget controlWidget1;
 	DisplayControlWidget controlWidget2;
 
@@ -146,10 +146,10 @@ import javax.swing.*;
 	FFT fft;
 	BeatDetect beat;
 	int bufferSize = 1024;
-	
+
 	JFileChooser fileChooser;
 	public boolean choosingFile = false;
-	
+
 	public void setup() {
 
 	  // Triknet
@@ -157,7 +157,7 @@ import javax.swing.*;
 	    triknet = new Triknet(this, CONTROLLER_IP, STRANDS, STRAND_LENGTH);
 	    triknet.TL_open();
 	  }
-	  
+
 	  // Minim
 	  minim = new Minim(this);
 	  input = minim.getLineIn();
@@ -167,10 +167,10 @@ import javax.swing.*;
 	  beat = new BeatDetect(source.bufferSize(), source.sampleRate());
 	  beat.detectMode(BeatDetect.SOUND_ENERGY);
 	  fft.logAverages(minOctave, bandsPerOctave*2);
-	  println("Buffer size is " + source.bufferSize() + 
+	  println("Buffer size is " + source.bufferSize() +
 	      ", sample rate is " + source.sampleRate());
 	  println(fft.avgSize() + " averages");
-	  
+
 	  setAllLights(0, 0, 0);
           for (int i = 0; i < STRANDS; i++) {
             for (int j = 0; j <= i; j++) {
@@ -178,10 +178,10 @@ import javax.swing.*;
             }
           }
 
-	  try { 
-		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
-	  } catch (Exception e) { 
-		  e.printStackTrace();  
+	  try {
+		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	  } catch (Exception e) {
+		  e.printStackTrace();
 	  }
 	  fileChooser = new JFileChooser("/");
 
@@ -198,7 +198,7 @@ import javax.swing.*;
 //	  volatilitySlider.setLabel("[v]olatility");
 //	  volatilitySlider.setShortcutKey('v');
 //	  volatilitySlider.setShowValues(true);
-	  
+
 	  registerAll(resetButton);
 	//  registerAll(rotateButton);
 	//  registerAll(bandSliderFull);
@@ -218,9 +218,9 @@ import javax.swing.*;
 	  registerAll(loadDisplay1Button);
 	  registerAll(saveDisplay2Button);
 	  registerAll(loadDisplay2Button);
-	  
+
 	  symmetryCheckbox.setActionDelegate(
-	    new ActionDelegate() { 
+	    new ActionDelegate() {
 	      public void doAction(InputEvent event) {
 	        if (symmetryCheckbox.isChecked()) {
 //	          unregisterAll(bandSliderFull);
@@ -240,7 +240,7 @@ import javax.swing.*;
 	      }
 	    });
 	  logPowerCheckbox.setActionDelegate(
-	    new ActionDelegate() { 
+	    new ActionDelegate() {
 	      public void doAction(InputEvent event) {
 	        if (logPowerCheckbox.isChecked()) {
 //	          eqDisplay.setGlobalLevelMultiplier(12);
@@ -254,14 +254,14 @@ import javax.swing.*;
 	      }
 	    });
 //	  volatilitySlider.setActionDelegate(
-//	    new ActionDelegate() { 
+//	    new ActionDelegate() {
 //	      public void doAction(InputEvent event) {
 //	        randomizerVolatility = volatilitySlider.getPositions()[0] / 10f;
 //	      }
 //	    });
-	  
+
 	  textFont(loadFont("ArialMT-12.vlw"), 12);
-	  
+
 //	  colorEqDisplay1 = new ColorEqDisplay(fft, bandSliderFull.getPositions(), bandSliderFull.getLength()*4, color(0, 50, 255), color(0, 255, 50));
 //	  colorEqDisplay2 = new ColorEqDisplay(fft, bandSliderFull.getPositions(), bandSliderFull.getLength()*4, color(0, 255, 0), color(255, 0, 0));
 //	  eqDisplay = new EqualizerDisplay(fft, bandSliderFull.getPositions(), bandSliderFull.getLength()*4);
@@ -280,7 +280,7 @@ import javax.swing.*;
 //	  fullDisplay = rainDisplay;
 //	  topDisplay = eqDisplay;
 //	  sideDisplay = eqDisplay;
-	  
+
 	  try {
 		  new ObjectOutputStream(new FileOutputStream("/colorEqDisplay")).writeObject(new ColorEqDisplay(fft, bandSliderFull.getPositions(), bandSliderFull.getLength()*4, color(0, 255, 0), color(255, 0, 0)));
 		  new ObjectOutputStream(new FileOutputStream("/rainDisplay")).writeObject(new RainDisplay(color(0, 255, 255), 24, .5, .25));
@@ -290,7 +290,7 @@ import javax.swing.*;
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
-	  
+
 	  try {
 		  topDisplay = (LightDisplay) new ObjectInputStream(new FileInputStream("topDisplay")).readObject();
 	  } catch (FileNotFoundException e) {
@@ -330,7 +330,7 @@ import javax.swing.*;
 
 	public void draw() {
 	  background(153);
-	  
+
 	  // Randomization
 //	  if (randomizeCheckbox.isChecked()) {
 ////	    int newColor = randomColor(setColor1Button.getFillColor());
@@ -384,13 +384,13 @@ import javax.swing.*;
 	        }
 	      }
 	    }
-	  }  
+	  }
 
 	  drawLights();
 	  if (triknet != null)
 	    triknet.TL_out(lights, 10);
 	  try {Thread.sleep(17);}catch(InterruptedException e){}
-	  
+
 	}
 
 	void tween(int strandNum, int lightNum, int targetColor) {
@@ -438,13 +438,13 @@ import javax.swing.*;
 
 	public void stop() {
 	  // Triknet
-	  if (triknet != null) 
+	  if (triknet != null)
 	    triknet.TL_close();
-	  
+
 	  // Minim
 	  input.close();
 	  minim.stop();
-	  
+
 	  try {
 //		  new ObjectOutputStream(new FileOutputStream("fullDisplay")).writeObject(fullDisplay);
 		  if (topDisplay != null) new ObjectOutputStream(new FileOutputStream("topDisplay")).writeObject(topDisplay);
@@ -454,7 +454,7 @@ import javax.swing.*;
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
-	  
+
 	  super.stop();
 	}
 
@@ -469,7 +469,7 @@ import javax.swing.*;
 	    r = (int) (r * factor);
 	    b = (int) (b * factor);
 	    g = (int) (g * factor);
-	    
+
 	    result = color(r, g, b);
 	  }
 	  return result;
@@ -501,9 +501,9 @@ import javax.swing.*;
 
 	private void loadDisplay1() {
 		choosingFile = true;
-		int returnVal = fileChooser.showOpenDialog(this); 
+		int returnVal = fileChooser.showOpenDialog(this);
 		choosingFile = false;
-		if (returnVal == JFileChooser.APPROVE_OPTION) { 
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			if (file.isFile()) {
 				ObjectInputStream is = null;
@@ -540,12 +540,12 @@ import javax.swing.*;
 			controlWidget1 = newWidget;
 		}
 	}
-	
+
 	private void loadDisplay2() {
 		choosingFile = true;
-		int returnVal = fileChooser.showOpenDialog(this); 
+		int returnVal = fileChooser.showOpenDialog(this);
 		choosingFile = false;
-		if (returnVal == JFileChooser.APPROVE_OPTION) { 
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			if (file.isFile()) {
 				ObjectInputStream is = null;
@@ -582,7 +582,7 @@ import javax.swing.*;
 			controlWidget2 = newWidget;
 		}
 	}
-	
+
 	private void saveDisplay1() {
 		if (controlWidget1 == null) return;
 		choosingFile = true;
@@ -609,7 +609,7 @@ import javax.swing.*;
 			}
 		}
 	}
-	
+
 	private void saveDisplay2() {
 		if (controlWidget2 == null) return;
 		choosingFile = true;
@@ -636,7 +636,7 @@ import javax.swing.*;
 			}
 		}
 	}
-	
+
 	private void configureDisplay(LightDisplay display) {
 		if (display instanceof BeatDetector) {
 			((BeatDetector) display).setBeat(beat);
@@ -645,7 +645,7 @@ import javax.swing.*;
 			((Equalizer) display).setEq(fft);
 		}
 	}
-	
+
 	private Equalizer[] getEqualizers() {
 		Equalizer[] result;
 		boolean sideIsEq = (sideDisplay != null && sideDisplay instanceof Equalizer);
@@ -698,7 +698,7 @@ import javax.swing.*;
 	  for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
 	    setLight(STRANDS-1, lightNum, tmp[lightNum]);
 	  }
-	} 
+	}
 
 	void rotateStrandsCW() {
 	  int[] tmp = lights[STRANDS-1].clone();
@@ -737,16 +737,16 @@ import javax.swing.*;
 	  int newGreen = (int) green(oldColor);
 	  int newBlue = (int) blue(oldColor);
 	  float rand;
-	  
+
 	  if (randomizerVolatility > 1) {
 	    rand = random(1);
 	    if (rand < 1/3f) newRed += (int) randomizerVolatility;
 	    else if (rand < 2/3f) newRed-= (int) randomizerVolatility;
-	    
+
 	    rand = random(1);
 	    if (rand < 1/3f) newGreen+= (int) randomizerVolatility;
 	    else if (rand < 2/3f) newGreen-= (int) randomizerVolatility;
-	    
+
 	    rand = random(1);
 	    if (rand < 1/3f) newBlue+= (int) randomizerVolatility;
 	    else if (rand < 2/3f) newBlue-= (int) randomizerVolatility;
@@ -754,11 +754,11 @@ import javax.swing.*;
 	    rand = random(1);
 	    if (rand < 1/3f) newRed += random(1) < randomizerVolatility ? 1 : 0;
 	    else if (rand < 2/3f) newRed-= random(1) < randomizerVolatility ? 1 : 0;
-	    
+
 	    rand = random(1);
 	    if (rand < 1/3f) newGreen+= random(1) < randomizerVolatility ? 1 : 0;
 	    else if (rand < 2/3f) newGreen-= random(1) < randomizerVolatility ? 1 : 0;
-	    
+
 	    rand = random(1);
 	    if (rand < 1/3f) newBlue+= random(1) < randomizerVolatility ? 1 : 0;
 	    else if (rand < 2/3f) newBlue-= random(1) < randomizerVolatility ? 1 : 0;
@@ -781,10 +781,9 @@ import javax.swing.*;
 			unregisterKeyEvent(o);
 		}
 	}
-	
+
 	protected void checkMouseEvent(MouseEvent e) {
 		if (!choosingFile) {
 			super.checkMouseEvent(e);
 		}
 	}
-	
