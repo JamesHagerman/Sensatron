@@ -11,24 +11,29 @@ float centerFrequency = 0;
 float height2;
 float spectrumScale = 2;
 
-
-// Just display (not for the real app:)
+// Already in APP:
 // Car Lighting layout:
 int STRANDS = 12; // Number of physical wands
 int STRAND_LENGTH = 50; // Number of lights per strand
-int LED_COUNT = STRANDS * STRAND_LENGTH; // Total number of lights
-// TCL Variables:
+int LED_COUNT = STRAND_LENGTH; // Total number of lights
 int strandCount = STRANDS/2; // two wands per "strand" of output
 int pixelsOnStrand = STRAND_LENGTH*2; // twice as many pixels per "strand"
-int totalPixels = LED_COUNT;
+int totalPixels = strandCount * pixelsOnStrand;
 int[] p = new int[totalPixels];
 int[] remap = new int[totalPixels];
 /* Could also use PImage and loadPixels()/updatePixels()...many options! */
+int[][] lights = new int[STRANDS][STRAND_LENGTH];
+
+// DO NOT WANT IN APP:
 // A place to display the lights:
 PGraphics lightDisplay;
-double dRad = (Math.PI*2)/STRANDS;
-int[][] lights = new int[STRANDS][STRAND_LENGTH];
 int SPACING = 5;
+double dRad = (Math.PI*2)/STRANDS;
+
+// ANIMATION REQUIRED:
+int ledCount = 0;
+float goodFFTBuckets[] = new float[STRAND_LENGTH];
+float goodFFTLog[] = new float[STRAND_LENGTH];
 
 void setup() {
   // Just for display:
@@ -59,14 +64,20 @@ void draw()
   background(0);
   stroke(255);
 
-
+  // Do whatever with the audio to get it into a format we can use:
+  processAudio();
 
   // DISPLAY:
-  setAllLights(getRandomColor());
-  drawLights();
-  mapDrawingToLights();
+  // setAllLights(getRandomColor());
 
-  processAudio();
+  // Convert the Audio into meaningful ART
+  doArt();
+
+  // Actually draw the colors to the screen:
+  // mapDrawingToLights(); // p[] -> lights[][]
+  // mapLightsToDrawing(); // lights[][] -> p[]
+  drawLights(); // draws lights[][]
+  // drawLEDs(); // draws p[] to the LEDs.
 
 }
 
@@ -76,6 +87,7 @@ void processAudio() {
   fft.forward( in.mix );
   fftLog.forward( in.mix );
 
+  ledCount = 0; // Reset ledCount
   for(int i = 0; i < fft.specSize(); i++)
   {
     if ( mouseX == i) {
@@ -88,9 +100,16 @@ void processAudio() {
     // 102 frequiency bands across, basically the range of the piano (up to C7)
     // line(i*10, height2, i*10, height2 - fft.getBand(i)*spectrumScale);
     line(i, height2, i, height2 - fft.getBand(i)*spectrumScale);
+
+    // Save the values into the goodFFTBuckets:
+    if (ledCount<STRAND_LENGTH) {
+      goodFFTBuckets[ledCount] = fft.getBand(i);
+    }
+    ledCount++; // increment for the next pass goodFFTLog
   }
 
 
+  ledCount = 0; // Reset ledCount
   // since logarithmically spaced averages are not equally spaced
   // we can't precompute the width for all averages
   for(int i = 0; i < fftLog.avgSize(); i++)
@@ -121,9 +140,24 @@ void processAudio() {
     }
     // draw a rectangle for each average, multiply the value by spectrumScale so we can see it better
     rect( xl, height, xr, height - fftLog.getAvg(i)*spectrumScale );
+
+    // Save the values into the goodFFTBuckets:
+    if (ledCount<STRAND_LENGTH) {
+      goodFFTLog[ledCount] = fft.getBand(i);
+    }
+    ledCount++; // increment for the next pass
   }
 }
 
+
+void doArt() {
+  for(int i = 0; i < STRAND_LENGTH; i++) {
+    int roundedVal = Math.round(goodFFTBuckets[i])*10;
+    // int roundedVal = Math.round(goodFFTLog[i])*10;
+    color whiteVal = color(roundedVal, roundedVal, roundedVal);
+    setOneRing(i, whiteVal);
+  }
+}
 
 
 
@@ -131,7 +165,6 @@ void processAudio() {
 color getRandomColor() {
   return color((int)random(255), (int)random(255), (int)random(255));
 }
-
 
 // LIGHTS STUFF:
 public void buildRemapArray() {
@@ -159,6 +192,14 @@ public void buildRemapArray() {
   }
   println("Done building remap array.");
 }
+void setOneLight(int strand, int lightNum, color c) {
+  lights[strand][lightNum] = c;
+}
+void setOneRing(int lightNum, color c) {
+  for (int i = 0; i < STRANDS; i++) {
+    lights[i][lightNum] = c;
+  }
+}
 // Setting all lights to some color:
 void setAllLights(color c) {
   for (int strand = 0; strand < STRANDS; strand++) {
@@ -167,8 +208,7 @@ void setAllLights(color c) {
     }
   }
 }
-// Method to move colors from the lights[][] multi-dimensional array
-// and to the lights array: p[]
+// Move colors from lights[][] to p[] structure
 void mapDrawingToLights() {
   // Lights on each strand to one big array
   int lightIndex = 0;
@@ -179,6 +219,7 @@ void mapDrawingToLights() {
     }
   }
 }
+// Move colors from p[] to lights[][] structure
 void mapLightsToDrawing() {
   // One big array to lights on each strand
   int lightIndex = 0;
@@ -189,12 +230,12 @@ void mapLightsToDrawing() {
     }
   }
 }
-// A method for actually drawing the lights:
+// Draw the lights[][] structure to the screen
 void drawLights() {
   int centerX = lightDisplay.width/2;
   int centerY = lightDisplay.height/2;
   lightDisplay.beginDraw();
-  lightDisplay.background(100);
+  // lightDisplay.background(100);
   lightDisplay.pushMatrix();
   //  rotateZ(radians(180));
   lightDisplay.translate(0, 0, -100);
@@ -204,7 +245,7 @@ void drawLights() {
     for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
       int c = lights[strand][lightNum];
       lightDisplay.fill(c);
-     noStroke();
+      noStroke();
       int y = (int) ((lightNum+3) * SPACING * Math.sin(theta));
       int x = (int) ((lightNum+3) * SPACING * Math.cos(theta));
       x = centerX - x;

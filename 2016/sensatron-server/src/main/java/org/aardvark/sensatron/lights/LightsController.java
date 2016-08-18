@@ -39,7 +39,7 @@ public class LightsController implements Runnable {
 
 	int STRANDS = 12; // Number of physical wands
 	int STRAND_LENGTH = 50; // Number of lights per strand
-	int LED_COUNT = STRAND_LENGTH; // Total number of lights
+	int LED_COUNT = STRANDS*STRAND_LENGTH; // Total number of lights
 
 	int strandCount = STRANDS/2; // two wands per "strand" of output
 	int pixelsOnStrand = STRAND_LENGTH*2; // twice as many pixels per "strand"
@@ -139,11 +139,8 @@ public class LightsController implements Runnable {
 	  //int x = (int)random(totalPixels);
 	  //p[x]  = 0x00ffffff;
 
-	  // Draw the p array to the lights using the remap function:
-
-	  if (tcl) {
-		  TotalControl.refresh(pixels, remap);
-	  }
+	  // Draw colors from pixel[] to the lights:
+		drawLEDs();
 
 	  // Set the random pixel back to black for the next pass:
 	  //p[x]  = 0;
@@ -155,6 +152,21 @@ public class LightsController implements Runnable {
 		TotalControl.close();
 	}
 
+
+	//=============
+	// HELPERS:
+	// Random color generator:
+	int getRandomColor() {
+	  return color((int)random(255), (int)random(255), (int)random(255));
+	}
+	public int color(int red, int green, int blue) {
+		return red << 16 | green << 8 | blue;
+	}
+	public int random(int max) {
+		return (int) (Math.random() * (max + 1));
+	}
+	// end helpers
+	//============
 
 	public void buildRemapArray() {
 	  log.debug("Building remap array...");
@@ -175,14 +187,8 @@ public class LightsController implements Runnable {
 	    for(int j=0;j<STRAND_LENGTH;j++) {
 	      if(j%2==0) { // even led's (0,2,4,6...)
 	        remap[j-(j/2) + (STRAND_LENGTH * i)] = index;
-//	          if (i == 1) {
-//	            log.debug("index " + index + " is: " + remap[index]);
-//	          }
 	      } else { // odd led's (1,3,5,7...)
 	         remap[(STRAND_LENGTH * (i+1)) - (j-(j/2))] = index;
-//	          if (i == 1) {
-//	            log.debug("index " + index + " is: " + remap[index]);
-//	          }
 	      }
 	      index += 1;
 	    }
@@ -191,12 +197,7 @@ public class LightsController implements Runnable {
 	  log.debug("Done building remap array.");
 	}
 
-	// Random color generator:
-	int getRandomColor() {
-	  return color((int)random(255), (int)random(255), (int)random(255));
-	}
-
-	// Setting all lights to some color:
+	// Setting all lights[][] to some color:
 	void setAllLights(int c) {
 	  for (int strand = 0; strand < STRANDS; strand++) {
 	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
@@ -204,9 +205,7 @@ public class LightsController implements Runnable {
 	    }
 	  }
 	}
-
-	// Method to move colors from the lights[][] multi-dimensional array
-	// and to the lights array: p[]
+	// Move colors from lights[][] to pixel[] structure
 	void mapDrawingToLights() {
 	  int lightIndex = 0;
 	  for (int strand = 0; strand < STRANDS; strand++) {
@@ -216,14 +215,13 @@ public class LightsController implements Runnable {
 	    }
 	  }
 	}
-
-	public int color(int red, int green, int blue) {
-		return red << 16 | green << 8 | blue;
+	// Draw color from pixel[] structure to the LEDs themselves:
+	void drawLEDs() {
+		if (tcl) {
+		  TotalControl.refresh(pixels, remap);
+	  }
 	}
 
-	public int random(int max) {
-		return (int) (Math.random() * (max + 1));
-	}
 
 	public LightParams getParams() {
 		try {
