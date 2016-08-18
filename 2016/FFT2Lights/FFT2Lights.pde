@@ -99,7 +99,7 @@ void processAudio() {
 
     // 102 frequiency bands across, basically the range of the piano (up to C7)
     // line(i*10, height2, i*10, height2 - fft.getBand(i)*spectrumScale);
-    line(i, height2, i, height2 - fft.getBand(i)*spectrumScale);
+    // line(i, height2, i, height2 - fft.getBand(i)*spectrumScale);
 
     // Save the values into the goodFFTBuckets:
     if (ledCount<STRAND_LENGTH) {
@@ -139,7 +139,7 @@ void processAudio() {
       fill(255);
     }
     // draw a rectangle for each average, multiply the value by spectrumScale so we can see it better
-    rect( xl, height, xr, height - fftLog.getAvg(i)*spectrumScale );
+    // rect( xl, height, xr, height - fftLog.getAvg(i)*spectrumScale );
 
     // Save the values into the goodFFTBuckets:
     if (ledCount<STRAND_LENGTH) {
@@ -154,8 +154,15 @@ void doArt() {
   for(int i = 0; i < STRAND_LENGTH; i++) {
     int roundedVal = Math.round(goodFFTBuckets[i])*10;
     // int roundedVal = Math.round(goodFFTLog[i])*10;
-    color whiteVal = color(roundedVal, roundedVal, roundedVal);
-    setOneRing(i, whiteVal);
+
+    // color whiteVal = color(roundedVal, roundedVal, roundedVal);
+    // setOneRing(i, whiteVal);
+
+    colorMode(HSB, 255);
+    color hsvColor = color(roundedVal, 255, 255);
+    setOneRing(i, hsvColor);
+    colorMode(RGB, 255);
+
   }
 }
 
@@ -239,7 +246,7 @@ void drawLights() {
   lightDisplay.pushMatrix();
   //  rotateZ(radians(180));
   lightDisplay.translate(0, 0, -100);
-  lightDisplay.rotateX(radians(45));
+  // lightDisplay.rotateX(radians(45));
   for (int strand = 0; strand < STRANDS; strand++) {
     double theta = strand * dRad - (PI/2) + PI;
     for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
