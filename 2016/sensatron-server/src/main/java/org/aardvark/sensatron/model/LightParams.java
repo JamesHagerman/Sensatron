@@ -5,9 +5,18 @@ import java.util.Arrays;
 public class LightParams implements Cloneable {
 	
 	private boolean on;
+	private int mode;
+	public int getMode() {
+		return mode;
+	}
+
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
+
 	private int hue1;
 	private int hue2;
-	private int brightness;
+	private int saturation;
 	private int slider4;
 	private int[] pitchSliders = new int[12];
 
@@ -21,7 +30,7 @@ public class LightParams implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "LightParams [on=" + on + ", hue1=" + hue1 + ", hue2=" + hue2 + ", brightness=" + brightness
+		return "LightParams [on=" + on + ", mode=" + mode + ", hue1=" + hue1 + ", hue2=" + hue2 + ", saturation=" + saturation
 				+ ", slider4=" + slider4 + ", pitchSliders=" + Arrays.toString(pitchSliders) + "]";
 	}
 
@@ -46,12 +55,12 @@ public class LightParams implements Cloneable {
 		this.hue2 = hue2;
 	}
 
-	public int getBrightness() {
-		return brightness;
+	public int getSaturation() {
+		return saturation;
 	}
 
-	public void setBrightness(int brightness) {
-		this.brightness = brightness;
+	public void setSaturation(int saturation) {
+		this.saturation = saturation;
 	}
 
 	public int getSlider4() {
