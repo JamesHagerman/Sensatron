@@ -4,7 +4,79 @@
 <meta charset="ISO-8859-1">
 <title>Sensatron</title>
 
-<script src="js/jquery-3.1.0.min.js"></script>
+  <link rel="stylesheet" href="css/jquery-ui.min.css">
+  <style>
+  body {
+  	background-color: black;
+  	color: white;
+  }
+  #hue1, #hue2 {
+    width: 360px;
+    height: 8px;
+    margin: 15px;
+  }
+  #swatch {
+    width: 120px;
+    height: 100px;
+    margin-top: 18px;
+    margin-left: 350px;
+    background-image: none;
+  }
+  #hue1.ui-slider { background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
+  #hue1 .ui-slider-handle { border-color: #ffffff; background: #ff0000; }
+  #hue2.ui-slider { background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); }
+  #hue2 .ui-slider-handle { border-color: #ffffff; background: #ff0000; }
+  #sat-slider .ui-slider { background: #999999; }
+  #sat-slider .ui-slider-handle { border-color: #000000; }
+  </style>
+  
+  <script src="js/jquery-3.1.0.min.js"></script>
+  <script src="js/jquery-ui.min.js"></script>
+  <script src="js/colorsys.js"></script>
+  <script>
+  prevSliders = {hue1: 0, hue2: 0, saturation: 0};
+  allowUpdate = true;
+  $( function() {
+    function hexFromRGB(r, g, b) {
+      var hex = [
+        r.toString( 16 ),
+        g.toString( 16 ),
+        b.toString( 16 )
+      ];
+      $.each( hex, function( nr, val ) {
+        if ( val.length === 1 ) {
+          hex[ nr ] = "0" + val;
+        }
+      });
+      return hex.join( "" ).toUpperCase();
+    }
+    function updateHue(event, ui) {
+      var hue = ui.value;
+      var hex = colorsys.hsv2Hex(hue, 100, 100);
+      $(ui.handle).css( "background-color", hex );
+    }
+    function setHue(event, ui) {
+    	updateHue(event, ui);
+    	var sliderId = $(ui.handle).parent().prop('id');
+    	if (allowUpdate) {
+	    	var params = {}
+	    	params[sliderId] = ui.value;
+	    	updateLights(params)
+	    }
+    	prevSliders[sliderId] = ui.value;
+    }
+    $( "#hue1, #hue2" ).slider({
+      orientation: "horizontal",
+      range: false,
+      max: 359,
+      value: 0,
+      slide: updateHue,
+      change: setHue
+    });
+    
+    updateLights({});
+  } );
+  </script>
 <script>
 SERVICE_URL = 'rs/lights'
 
@@ -18,7 +90,11 @@ function toggle() {
 
 function lightParamsCallback(settingsJSON) {
 	var settings = JSON.parse(settingsJSON);
+	allowUpdate = false;
 	$('#lightsOn').text(settings.on ? 'on' : 'off');
+	$('#hue1').slider('value', settings.hue1);
+	$('#hue2').slider('value', settings.hue2);
+	allowUpdate = true;
 }
 
 </script>
@@ -26,8 +102,7 @@ function lightParamsCallback(settingsJSON) {
 <body>
 <p>Lights are <span id="lightsOn"></span></p>
 <button onclick="toggle()">Toggle Lights</button>
-<script>
-updateLights({});
-</script>
+<div id="hue1"></div>
+<div id="hue2"></div>
 </body>
 </html>

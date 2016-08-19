@@ -31,7 +31,9 @@ public class SensatronRestController {
 	}
 
 	@RequestMapping(value = "/lights", method = RequestMethod.POST)
-	public String postSomething(@RequestParam(value = "toggle", required = false) Boolean toggle) {
+	public String postSomething(@RequestParam(value = "toggle", required = false) Boolean toggle,
+								@RequestParam(value = "hue1", required = false) Integer hue1,
+								@RequestParam(value = "hue2", required = false) Integer hue2) {
 		LightParams lightParams = lightsController.getParams();
 		if (toggle != null && toggle) {
 			if (lightParams.isOn()) {
@@ -39,6 +41,12 @@ public class SensatronRestController {
 			} else {
 				lightParams.setOn(true);
 			}
+		}
+		if (hue1 != null) {
+			lightParams.setHue1(hue1);
+		}
+		if (hue2 != null) {
+			lightParams.setHue2(hue2);
 		}
 		lightsController.setParams(lightParams);
 		
