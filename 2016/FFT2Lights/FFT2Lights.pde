@@ -164,15 +164,15 @@ void doArt() {
   // int shiftedTime = (globalTime/paramValue)%STRANDS;
 
   for(int i = 0; i < STRAND_LENGTH; i++) {
-    // int roundedVal = Math.round(goodFFTBuckets[i])*10;
-    int roundedVal = Math.round(goodFFTLog[i])*10;
+    int roundedVal = Math.round(goodFFTBuckets[i])*10;
+    // int roundedVal = Math.round(goodFFTLog[i])*10;
 
     colorMode(HSB, 255);
     color theColor = color(roundedVal, 255, 255);
     // color theColor = color(globalTime%255, 255, 255);
     // color theColor = color(roundedVal, roundedVal, roundedVal);
     // setOneRing(i, theColor);
-    setOneSpiral(0, i, 4, theColor);
+    setOneSpiral(0, i, 1, theColor);
     colorMode(RGB, 255);
 
   }

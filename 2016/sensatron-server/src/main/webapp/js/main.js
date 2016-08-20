@@ -1,15 +1,30 @@
+SERVICE_URL = 'rs/lights'
 
-var socket = io.connect();
-// socket.on('news', function (data) {
-//   console.log(data);
-//   socket.emit('start app', { my: 'data' });
-// });
+function updateLights(params) {
+  console.log('update lights');
+	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
+}
+
+function toggle() {
+  console.log('toggle hit!');
+	updateLights({toggle: 'true'});
+}
+
+function lightParamsCallback(settingsJSON) {
+  console.log('lightParamsCallback hit');
+	var settings = JSON.parse(settingsJSON);
+	$('#lightsOn').text(settings.on ? 'on' : 'off');
+}
+
+
 
 
 // Entry point to the whole show:
 // Note: This uses jQuery:
 $(document).ready(function() {
   // This block runs when the document is ready.
+
+	updateLights({});
 
   // Setup the color picker:
   Color.setHSV();
@@ -31,7 +46,6 @@ $(document).ready(function() {
     // console.log('color: ', color, Color.getCSSColor());
     $('.canvas').css('background-color', Color.getCSSColor());
 
-    // socket.emit('color', {r: color[0], g: color[1], b: color[2]});
     // $('.canvas').off('mousemove');
 
     $.ajax({

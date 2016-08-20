@@ -15,9 +15,9 @@ import com.google.gson.Gson;
 @RestController
 @RequestMapping("/")
 public class SensatronRestController {
-	
+
 	Gson gson = new Gson();
-	
+
 	@Autowired
 	LightsController lightsController;
 
@@ -26,7 +26,7 @@ public class SensatronRestController {
 
 	@RequestMapping(value = "/lights", method = RequestMethod.GET)
 	public String getSomething(@RequestParam(value = "request") String request,	@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
-		
+
 		return gson.toJson(lightsController.getParams());
 	}
 
@@ -41,13 +41,13 @@ public class SensatronRestController {
 			}
 		}
 		lightsController.setParams(lightParams);
-		
+
 		return gson.toJson(lightParams);
 	}
 
-	@RequestMapping(value = "/<add method name here>", method = RequestMethod.PUT)
+	@RequestMapping(value = "/lights", method = RequestMethod.PUT)
 	public String putSomething(@RequestBody String request,@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Start putSomething");
 			logger.debug("data: '" + request + "'");
@@ -78,9 +78,9 @@ public class SensatronRestController {
 		return response;
 	}
 
-	@RequestMapping(value = "/<add method name here>", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/lights", method = RequestMethod.DELETE)
 	public void deleteSomething(@RequestBody String request,@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Start putSomething");
 			logger.debug("data: '" + request + "'");

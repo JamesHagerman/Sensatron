@@ -63,8 +63,7 @@ public class LightsController implements Runnable {
 	// DEBUG:
 	boolean derp = false;
 
-	void setup()
-	{
+	void setup() {
 		log.info("SETUP!");
 		try {
 			minim = new Minim(this);
@@ -206,8 +205,8 @@ public class LightsController implements Runnable {
 	  // int shiftedTime = (globalTime/paramValue)%STRANDS;
 
 	  for(int i = 0; i < STRAND_LENGTH; i++) {
-	    // int roundedVal = Math.round(goodFFTBuckets[i])*10;
-	    int roundedVal = Math.round(goodFFTLog[i])*10;
+	    int roundedVal = Math.round(goodFFTBuckets[i])*10;
+	    // int roundedVal = Math.round(goodFFTLog[i])*10;
 
 	    // colorMode(HSB, 255);
 	    // color theColor = color(roundedVal, 255, 255);
@@ -216,9 +215,11 @@ public class LightsController implements Runnable {
 	    // color theColor = color(globalTime%255, 255, 255);
 	    // color theColor = color(roundedVal, roundedVal, roundedVal);
 	    // setOneRing(i, theColor);
-	    setOneSpiral(0, i, 4, theColor);
+	    setOneSpiral(0, i, 1, theColor);
 	    // colorMode(RGB, 255);
 	  }
+
+		// setOneStrand(0, Color.HSBtoRGB(64/255.0f, 1.0f, 1.0f) );
 	}
 
 	//=============
@@ -250,6 +251,11 @@ public class LightsController implements Runnable {
 	void setOneRing(int lightNum, int c) {
 	  for (int i = 0; i < STRANDS; i++) {
 	    setOneLight(i, lightNum, c);
+	  }
+	}
+	void setOneStrand(int strand, int c) {
+	  for (int i = 0; i < STRAND_LENGTH; i++) {
+	    setOneLight(strand, i, c);
 	  }
 	}
 	void setOneSpiral(int strand, int lightNum, int direction, int c) {

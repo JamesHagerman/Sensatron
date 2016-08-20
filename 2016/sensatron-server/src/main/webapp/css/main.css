@@ -1,0 +1,13 @@
+.content,
+.canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.htmlContent {
+  position: absolute;
+}
+
+.canvas {
+   position: absolute;
+}
