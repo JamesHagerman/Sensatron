@@ -1,5 +1,16 @@
 SERVICE_URL = 'rs/lights'
 
+var theParams = {
+   'on': true,
+   'mode': 4,
+   'hue1': 2,
+   'hue2': 3,
+   'saturation': 6,
+   'slider4': 5,
+   'pitchSliders': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+};
+
+
 function updateLights(params) {
   console.log('update lights');
 	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
@@ -48,17 +59,18 @@ $(document).ready(function() {
 
     // $('.canvas').off('mousemove');
 
+    theParams.hue1 = Math.round(xscale*255);
+    theParams.hue2 = Math.round(yscale*255);
+
     $.ajax({
        url: 'http://localhost:8080/rs/lights',
-       data: {
-          derp: 'this is a string'
-       },
-       error: function() {
-          $('#info').html('<p>An error has occurred</p>');
+       data: JSON.stringify(theParams),
+       error: function(e) {
+          console.log('Error on AJAX', e);
        },
       //  dataType: 'jsonp',
        success: function(data) {
-          console.log('data: ', JSON.stringify(data, 0, 2));
+          // console.log('data: ', data);
        },
        type: 'PUT'
     });

@@ -25,8 +25,8 @@ public class SensatronRestController {
 	private static final Logger logger = Logger.getLogger(SensatronRestController.class);
 
 	@RequestMapping(value = "/lights", method = RequestMethod.GET)
-	public String getSomething(@RequestParam(value = "request") String request,	@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
-
+	public String getSomething(@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
+		// Return the current params:
 		return gson.toJson(lightsController.getParams());
 	}
 
@@ -40,42 +40,49 @@ public class SensatronRestController {
 				lightParams.setOn(true);
 			}
 		}
+
+
+
 		lightsController.setParams(lightParams);
 
 		return gson.toJson(lightParams);
 	}
 
 	@RequestMapping(value = "/lights", method = RequestMethod.PUT)
-	public String putSomething(@RequestBody String request,@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
+	public String putSomething(@RequestBody String request, @RequestParam(value = "version", required = false, defaultValue = "1") int version) {
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Start putSomething");
-			logger.debug("data: '" + request + "'");
-		}
+		// if (logger.isDebugEnabled()) {
+		// 	logger.debug("Start putSomething");
+		// 	logger.debug("data: '" + request + "'");
+		// }
 
-		String response = null;
+		LightParams params = gson.fromJson(request, LightParams.class);
+		lightsController.setParams(params);
+		return gson.toJson(params);
 
-		try {
-			switch (version) {
-			case 1:
-				if (logger.isDebugEnabled())
-					logger.debug("in version 1");
-				// TODO: add your business logic here
-				response = "Response from Spring RESTful Webservice : "+ request;
-
-				break;
-			default:
-				throw new Exception("Unsupported version: " + version);
-			}
-		} catch (Exception e) {
-			response = e.getMessage().toString();
-		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("result: '" + response + "'");
-			logger.debug("End putSomething");
-		}
-		return response;
+		// String response = null;
+		//
+		// try {
+		// 	switch (version) {
+		// 	case 1:
+		// 		if (logger.isDebugEnabled())
+		// 			logger.debug("in version 1");
+		// 		// TODO: add your business logic here
+		// 		response = "Response from Spring RESTful Webservice : "+ request;
+		//
+		// 		break;
+		// 	default:
+		// 		throw new Exception("Unsupported version: " + version);
+		// 	}
+		// } catch (Exception e) {
+		// 	response = e.getMessage().toString();
+		// }
+		//
+		// if (logger.isDebugEnabled()) {
+		// 	logger.debug("result: '" + response + "'");
+		// 	logger.debug("End putSomething");
+		// }
+		// return response;
 	}
 
 	@RequestMapping(value = "/lights", method = RequestMethod.DELETE)
