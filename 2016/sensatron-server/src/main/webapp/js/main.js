@@ -49,7 +49,7 @@ $(document).ready(function() {
     // $('.canvas').off('mousemove');
 
     $.ajax({
-       url: 'http://localhost:8080/lights',
+       url: 'http://localhost:8080/rs/lights',
        data: {
           derp: 'this is a string'
        },
