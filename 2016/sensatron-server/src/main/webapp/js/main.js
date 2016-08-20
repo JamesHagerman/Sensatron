@@ -26,22 +26,24 @@ function lightParamsCallback(settingsJSON) {
 	var settings = JSON.parse(settingsJSON);
 	allowUpdate = false;
 	$('#lightsOn').text(settings.on ? 'on' : 'off');
-	$('#hue1').slider('value', settings.hue1);
-	$('#hue2').slider('value', settings.hue2);
+	$('#hue1').val(settings.hue1).change();
+	$('#hue2').val(settings.hue2).change();
 	allowUpdate = true;
 }
 
-  function updateHue(event, ui) {
-    var hue = ui.value;
+  function updateHue(event) {
+    var hue = $(this).val();
     var hex = colorsys.hsv2Hex(hue, 100, 100);
-    $(ui.handle).css( "background-color", hex );
+    $(this).parent().find('.ui-slider-handle').css( "background-color", hex );
   }
-  function setHue(event, ui) {
-  	updateHue(event, ui);
-  	var sliderId = $(ui.handle).parent().prop('id');
+  function setHue(event) {
+    var hue = $(this).val();
+    var hex = colorsys.hsv2Hex(hue, 100, 100);
+    $(this).parent().find('.ui-slider-handle').css( "background-color", hex );
   	if (allowUpdate) {
+  	  	var sliderId = $(this).prop('id');
     	var params = {}
-    	params[sliderId] = ui.value;
+    	params[sliderId] = hue;
     	updateLights(params)
     }
   }
@@ -51,15 +53,6 @@ function lightParamsCallback(settingsJSON) {
 $(document).ready(function() {
   // This block runs when the document is ready.
 
-	  $( "#hue1, #hue2" ).slider({
-	    orientation: "horizontal",
-	    range: false,
-	    max: 359,
-	    value: 0,
-	    slide: updateHue,
-	    change: setHue
-	  });
-		  
 	updateLights({});
 
   // Setup the color picker:
@@ -68,6 +61,8 @@ $(document).ready(function() {
   // Add an event listener on the canvas to catch
   // mouse movements:
   $('.canvas').on('touchmove mousemove', handleMovement);
+  
+  $('.hue-slider').change(setHue);
 });
 
 function handleMovement(event) {
