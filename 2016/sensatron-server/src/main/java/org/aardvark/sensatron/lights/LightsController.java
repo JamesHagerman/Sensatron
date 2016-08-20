@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import java.awt.Color;
+
 import org.aardvark.sensatron.model.LightParams;
 import org.apache.log4j.Logger;
 
@@ -52,14 +54,25 @@ public class LightsController implements Runnable {
 	int[][] lights = new int[STRANDS][STRAND_LENGTH];
 	int SPACING = 5;
 
-	void setup()
-	{
+	// ANIMATION REQUIRED:
+	int globalTime = 0;
+	int ledCount = 0;
+	float goodFFTBuckets[] = new float[STRAND_LENGTH];
+	float goodFFTLog[] = new float[STRAND_LENGTH];
+
+	// DEBUG:
+	boolean derp = false;
+
+	void setup() {
 		log.info("SETUP!");
 		try {
 			minim = new Minim(this);
 		  in = minim.getLineIn(Minim.STEREO, bufferSize);
 		  in.enableMonitoring();
 			fft = new FFT( in.bufferSize(), in.sampleRate() );
+		  fftLog = new FFT( in.bufferSize(), in.sampleRate() );
+		  fftLog.logAverages( 10, 8 );
+			log.info("fftLog.avgSize(): " + fftLog.avgSize());
 			if (in.isMonitoring()) {
 				log.info("Audio should be monitoring...");
 			}
@@ -118,8 +131,14 @@ public class LightsController implements Runnable {
 		stopping = true;
 	}
 
-	void draw(LightParams p)
-	{
+	void draw(LightParams p) {
+		globalTime++;
+		processAudio();
+		// Maybe handle LightParams here somehow?
+		// p
+
+		// Light debug:
+		// if (derp) {
 		// if (p.isOn()) {
 		// 	log.trace("Turning lights on");
 		// 	setAllLights(color(255,255,255));
@@ -127,23 +146,15 @@ public class LightsController implements Runnable {
 		// 	log.trace("Turning lights off");
 		// 	setAllLights(0);
 		// }
+		// derp = !derp;
 
-		fft.forward( in.mix );
-		int band = Math.round(fft.getBand(0));
-		// log.info("Band: " + band);
-		setAllLights(color(band, band, band));
 
-	  mapDrawingToLights();
+		doArt();
 
-	  // Set some random pixel to full white:
-	  //int x = (int)random(totalPixels);
-	  //p[x]  = 0x00ffffff;
-
-	  // Draw colors from pixel[] to the lights:
-		drawLEDs();
-
-	  // Set the random pixel back to black for the next pass:
-	  //p[x]  = 0;
+		// REQUIRED CODE:
+		mapDrawingToLights(); // lights[][] -> pixel[]
+		drawLEDs(); // draws pixel[] to the LEDs.
+		// YUP.
 	}
 
 	void exit()
@@ -152,6 +163,64 @@ public class LightsController implements Runnable {
 		TotalControl.close();
 	}
 
+
+	// Audio handler:
+	void processAudio() {
+	  // AUDIO DRAW:
+	  fft.forward( in.mix );
+	  fftLog.forward( in.mix );
+
+	  ledCount = 0; // Reset ledCount
+	  for(int i = 0; i < fft.specSize(); i++)
+	  {
+	    // Save the values into the goodFFTBuckets:
+	    if (ledCount<STRAND_LENGTH) {
+	      goodFFTBuckets[ledCount] = fft.getBand(i);
+	    }
+	    ledCount++; // increment for the next pass goodFFTLog
+	  }
+
+
+	  ledCount = 0; // Reset ledCount
+	  // since logarithmically spaced averages are not equally spaced
+	  // we can't precompute the width for all averages
+	  for(int i = 0; i < fftLog.avgSize(); i++)
+	  {
+	    // Save the values into the goodFFTBuckets:
+	    if (ledCount<STRAND_LENGTH) {
+	      goodFFTLog[ledCount] = fftLog.getAvg(i);
+	    }
+	    ledCount++; // increment for the next pass
+	  }
+	}
+
+
+	void doArt() {
+	  int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
+	  int signedValue = paramValue-(255/2);
+
+	  if (paramValue == 0) paramValue = 1;
+
+	  // println("derp: " + paramValue);
+	  // int shiftedTime = (globalTime/paramValue)%STRANDS;
+
+	  for(int i = 0; i < STRAND_LENGTH; i++) {
+	    int roundedVal = Math.round(goodFFTBuckets[i])*10;
+	    // int roundedVal = Math.round(goodFFTLog[i])*10;
+
+	    // colorMode(HSB, 255);
+	    // color theColor = color(roundedVal, 255, 255);
+
+			int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
+	    // color theColor = color(globalTime%255, 255, 255);
+	    // color theColor = color(roundedVal, roundedVal, roundedVal);
+	    // setOneRing(i, theColor);
+	    setOneSpiral(0, i, 1, theColor);
+	    // colorMode(RGB, 255);
+	  }
+
+		// setOneStrand(0, Color.HSBtoRGB(64/255.0f, 1.0f, 1.0f) );
+	}
 
 	//=============
 	// HELPERS:
@@ -167,6 +236,34 @@ public class LightsController implements Runnable {
 	}
 	// end helpers
 	//============
+	void setOneLight(int strand, int lightNum, int c) {
+	  strand = strand%STRANDS;
+	  lightNum = lightNum%STRAND_LENGTH;
+	  lights[strand][lightNum] = c;
+	}
+	void setAllLights(int c) {
+	  for (int strand = 0; strand < STRANDS; strand++) {
+	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+	      setOneLight(strand, lightNum, c);
+	    }
+	  }
+	}
+	void setOneRing(int lightNum, int c) {
+	  for (int i = 0; i < STRANDS; i++) {
+	    setOneLight(i, lightNum, c);
+	  }
+	}
+	void setOneStrand(int strand, int c) {
+	  for (int i = 0; i < STRAND_LENGTH; i++) {
+	    setOneLight(strand, i, c);
+	  }
+	}
+	void setOneSpiral(int strand, int lightNum, int direction, int c) {
+	  for (int i = 0; i < STRANDS; i++) {
+	    int lightOffset = lightNum + (i * direction);
+	    setOneLight(strand + i, lightOffset, c);
+	  }
+	}
 
 	public void buildRemapArray() {
 	  log.debug("Building remap array...");
@@ -196,16 +293,7 @@ public class LightsController implements Runnable {
 
 	  log.debug("Done building remap array.");
 	}
-
-	// Setting all lights[][] to some color:
-	void setAllLights(int c) {
-	  for (int strand = 0; strand < STRANDS; strand++) {
-	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
-	      lights[strand][lightNum] = c;
-	    }
-	  }
-	}
-	// Move colors from lights[][] to pixel[] structure
+		// Move colors from lights[][] to pixel[] structure
 	void mapDrawingToLights() {
 	  int lightIndex = 0;
 	  for (int strand = 0; strand < STRANDS; strand++) {

@@ -30,74 +30,11 @@
   #sat-slider .ui-slider-handle { border-color: #000000; }
   </style>
   
+  <link rel="stylesheet" href="/css/main.css">
   <script src="js/jquery-3.1.0.min.js"></script>
   <script src="js/jquery-ui.min.js"></script>
   <script src="js/colorsys.js"></script>
-  <script>
-  prevSliders = {hue1: 0, hue2: 0, saturation: 0};
-  allowUpdate = true;
-  $( function() {
-    function hexFromRGB(r, g, b) {
-      var hex = [
-        r.toString( 16 ),
-        g.toString( 16 ),
-        b.toString( 16 )
-      ];
-      $.each( hex, function( nr, val ) {
-        if ( val.length === 1 ) {
-          hex[ nr ] = "0" + val;
-        }
-      });
-      return hex.join( "" ).toUpperCase();
-    }
-    function updateHue(event, ui) {
-      var hue = ui.value;
-      var hex = colorsys.hsv2Hex(hue, 100, 100);
-      $(ui.handle).css( "background-color", hex );
-    }
-    function setHue(event, ui) {
-    	updateHue(event, ui);
-    	var sliderId = $(ui.handle).parent().prop('id');
-    	if (allowUpdate) {
-	    	var params = {}
-	    	params[sliderId] = ui.value;
-	    	updateLights(params)
-	    }
-    	prevSliders[sliderId] = ui.value;
-    }
-    $( "#hue1, #hue2" ).slider({
-      orientation: "horizontal",
-      range: false,
-      max: 359,
-      value: 0,
-      slide: updateHue,
-      change: setHue
-    });
-    
-    updateLights({});
-  } );
-  </script>
-<script>
-SERVICE_URL = 'rs/lights'
-
-function updateLights(params) {
-	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
-}
-
-function toggle() {
-	updateLights({toggle: 'true'});
-}
-
-function lightParamsCallback(settingsJSON) {
-	var settings = JSON.parse(settingsJSON);
-	allowUpdate = false;
-	$('#lightsOn').text(settings.on ? 'on' : 'off');
-	$('#hue1').slider('value', settings.hue1);
-	$('#hue2').slider('value', settings.hue2);
-	allowUpdate = true;
-}
-
-</script>
+  <script src="js/main.js"></script>
 </head>
 <body>
 <p>Lights are <span id="lightsOn"></span></p>
