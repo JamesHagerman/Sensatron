@@ -2,19 +2,25 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Sensatron</title>
 
-  <link rel="stylesheet" href="css/jquery-ui.min.css">
+  <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
   <link rel="stylesheet" href="/css/main.css">
-  <script src="js/jquery-3.1.0.min.js"></script>
-  <script src="js/jquery-ui.min.js"></script>
+  <script src="js/jquery-2.2.4.min.js"></script>
+  <script src="js/jquery.mobile-1.4.5.min.js"></script>
   <script src="js/colorsys.js"></script>
   <script src="js/main.js"></script>
 </head>
 <body>
-<p>Lights are <span id="lightsOn"></span></p>
-<button onclick="toggle()">Toggle Lights</button>
-<div id="hue1"></div>
-<div id="hue2"></div>
+	<p>Lights are <span id="lightsOn"></span></p>
+	<button onclick="toggle()">Toggle Lights</button>
+	<br/>
+	<label for="hue1" class="ui-hidden-accessible">Hue 1:</label>
+	<input type="range" class="hue-slider" name="hue1" id="hue1" min="0" max="359" value="0">
+	<br/>
+	<label for="hue2" class="ui-hidden-accessible">Hue 2:</label>
+	<input type="range" class="hue-slider" name="hue2" id="hue2" min="0" max="359" value="0">
 </body>
 </html>
