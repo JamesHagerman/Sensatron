@@ -134,8 +134,6 @@ public class LightsController implements Runnable {
 	void draw(LightParams p) {
 		globalTime++;
 		processAudio();
-		// Maybe handle LightParams here somehow?
-		// p
 
 		// Light debug:
 		// if (derp) {
@@ -149,7 +147,7 @@ public class LightsController implements Runnable {
 		// derp = !derp;
 
 
-		doArt();
+		doArt(p);
 
 		// REQUIRED CODE:
 		mapDrawingToLights(); // lights[][] -> pixel[]
@@ -195,18 +193,20 @@ public class LightsController implements Runnable {
 	}
 
 
-	void doArt() {
-	  int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
-	  int signedValue = paramValue-(255/2);
+	void doArt(LightParams p) {
+	  // int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
+	  // int signedValue = paramValue-(255/2);
 
-	  if (paramValue == 0) paramValue = 1;
+	  // if (paramValue == 0) paramValue = 1;
 
 	  // println("derp: " + paramValue);
-	  // int shiftedTime = (globalTime/paramValue)%STRANDS;
+	  int shiftedTime = Math.abs((int)Math.sin(globalTime)*p.getHue1());
 
-	  for(int i = 0; i < STRAND_LENGTH; i++) {
-	    int roundedVal = Math.round(goodFFTBuckets[i])*10;
-	    // int roundedVal = Math.round(goodFFTLog[i])*10;
+	  // for(int i = 0; i < STRAND_LENGTH; i++) {
+		for(int i = 0; i < STRAND_LENGTH; i++) {
+
+	    // int roundedVal = Math.round(goodFFTBuckets[i])*10;
+	    int roundedVal = Math.round(goodFFTLog[i]); // *shiftedTime
 
 	    // colorMode(HSB, 255);
 	    // color theColor = color(roundedVal, 255, 255);
@@ -214,8 +214,8 @@ public class LightsController implements Runnable {
 			int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
 	    // color theColor = color(globalTime%255, 255, 255);
 	    // color theColor = color(roundedVal, roundedVal, roundedVal);
-	    // setOneRing(i, theColor);
-	    setOneSpiral(0, i, 1, theColor);
+	    setOneRing(i, theColor);
+	    // setOneSpiral(0, i, 1, theColor);
 	    // colorMode(RGB, 255);
 	  }
 
@@ -321,7 +321,7 @@ public class LightsController implements Runnable {
 	}
 
 	public void setParams(LightParams params) {
-		log.debug("Params set to: " + params);
+		log.trace("Params set to: " + params);
 		this.params = params;
 	}
 
