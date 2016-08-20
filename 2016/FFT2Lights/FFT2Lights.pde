@@ -31,6 +31,7 @@ int SPACING = 5;
 double dRad = (Math.PI*2)/STRANDS;
 
 // ANIMATION REQUIRED:
+int globalTime = 0;
 int ledCount = 0;
 float goodFFTBuckets[] = new float[STRAND_LENGTH];
 float goodFFTLog[] = new float[STRAND_LENGTH];
@@ -56,13 +57,16 @@ void setup() {
   in.enableMonitoring();
   fft = new FFT( in.bufferSize(), in.sampleRate() );
   fftLog = new FFT( in.bufferSize(), in.sampleRate() );
-  fftLog.logAverages( 22, 3 );
+  fftLog.logAverages( 10, 8 );
+
+  println("fftLog.avgSize(): " + fftLog.avgSize());
 }
 
-void draw()
-{
+void draw() {
   background(0);
   stroke(255);
+
+  globalTime++;
 
   // Do whatever with the audio to get it into a format we can use:
   processAudio();
@@ -78,7 +82,6 @@ void draw()
   // mapLightsToDrawing(); // lights[][] -> p[]
   drawLights(); // draws lights[][]
   // drawLEDs(); // draws p[] to the LEDs.
-
 }
 
 
@@ -139,11 +142,11 @@ void processAudio() {
       fill(255);
     }
     // draw a rectangle for each average, multiply the value by spectrumScale so we can see it better
-    // rect( xl, height, xr, height - fftLog.getAvg(i)*spectrumScale );
+    rect( xl, height, xr, height - fftLog.getAvg(i)*spectrumScale );
 
     // Save the values into the goodFFTBuckets:
     if (ledCount<STRAND_LENGTH) {
-      goodFFTLog[ledCount] = fft.getBand(i);
+      goodFFTLog[ledCount] = fftLog.getAvg(i);
     }
     ledCount++; // increment for the next pass
   }
@@ -151,16 +154,25 @@ void processAudio() {
 
 
 void doArt() {
-  for(int i = 0; i < STRAND_LENGTH; i++) {
-    int roundedVal = Math.round(goodFFTBuckets[i])*10;
-    // int roundedVal = Math.round(goodFFTLog[i])*10;
 
-    // color whiteVal = color(roundedVal, roundedVal, roundedVal);
-    // setOneRing(i, whiteVal);
+  int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
+  int signedValue = paramValue-(255/2);
+
+  if (paramValue == 0) paramValue = 1;
+
+  // println("derp: " + paramValue);
+  // int shiftedTime = (globalTime/paramValue)%STRANDS;
+
+  for(int i = 0; i < STRAND_LENGTH; i++) {
+    // int roundedVal = Math.round(goodFFTBuckets[i])*10;
+    int roundedVal = Math.round(goodFFTLog[i])*10;
 
     colorMode(HSB, 255);
-    color hsvColor = color(roundedVal, 255, 255);
-    setOneRing(i, hsvColor);
+    color theColor = color(roundedVal, 255, 255);
+    // color theColor = color(globalTime%255, 255, 255);
+    // color theColor = color(roundedVal, roundedVal, roundedVal);
+    // setOneRing(i, theColor);
+    setOneSpiral(0, i, 4, theColor);
     colorMode(RGB, 255);
 
   }
@@ -172,8 +184,52 @@ void doArt() {
 color getRandomColor() {
   return color((int)random(255), (int)random(255), (int)random(255));
 }
-
+// int color(int red, int green, int blue) {
+//   return red << 16 | green << 8 | blue;
+// }
+// int random(int max) {
+//   return (int) (Math.random() * (max + 1));
+// }
 // LIGHTS STUFF:
+void setOneLight(int strand, int lightNum, color c) {
+  // println("Strand: " + strand + " lightnum: " + lightNum);
+  // if (strand < 0) {
+  //   strand += STRANDS;
+  // }
+  // if (strand >= STRANDS) {
+  //   strand = strand%STRANDS;
+  // }
+  strand = strand%STRANDS;
+  // if (lightNum < 0) {
+  //   lightNum += STRAND_LENGTH;
+  // }
+  // if (lightNum >= STRAND_LENGTH) {
+  //   lightNum = lightNum%STRAND_LENGTH;
+  // }
+  lightNum = lightNum%STRAND_LENGTH;
+
+  // println("Fixed Strand: " + strand + " lightnum: " + lightNum);
+  lights[strand][lightNum] = c;
+}
+void setOneRing(int lightNum, color c) {
+  for (int i = 0; i < STRANDS; i++) {
+    setOneLight(i, lightNum, c);
+  }
+}
+void setOneSpiral(int strand, int lightNum, int direction, color c) {
+  for (int i = 0; i < STRANDS; i++) {
+    int lightOffset = lightNum + (i * direction);
+    setOneLight(strand + i, lightOffset, c);
+  }
+}
+// Setting all lights to some color:
+void setAllLights(color c) {
+  for (int strand = 0; strand < STRANDS; strand++) {
+    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+      lights[strand][lightNum] = c;
+    }
+  }
+}
 public void buildRemapArray() {
   println("Building remap array...");
   // Linear mapping - No fold back:
@@ -198,22 +254,6 @@ public void buildRemapArray() {
     }
   }
   println("Done building remap array.");
-}
-void setOneLight(int strand, int lightNum, color c) {
-  lights[strand][lightNum] = c;
-}
-void setOneRing(int lightNum, color c) {
-  for (int i = 0; i < STRANDS; i++) {
-    lights[i][lightNum] = c;
-  }
-}
-// Setting all lights to some color:
-void setAllLights(color c) {
-  for (int strand = 0; strand < STRANDS; strand++) {
-    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
-      lights[strand][lightNum] = c;
-    }
-  }
 }
 // Move colors from lights[][] to p[] structure
 void mapDrawingToLights() {
