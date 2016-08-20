@@ -60,6 +60,9 @@ public class LightsController implements Runnable {
 	float goodFFTBuckets[] = new float[STRAND_LENGTH];
 	float goodFFTLog[] = new float[STRAND_LENGTH];
 
+	// DEBUG:
+	boolean derp = false;
+
 	void setup()
 	{
 		log.info("SETUP!");
@@ -129,30 +132,30 @@ public class LightsController implements Runnable {
 		stopping = true;
 	}
 
-	void draw(LightParams p)
-	{
-		if (p.isOn()) {
-			log.trace("Turning lights on");
-			setAllLights(color(255,255,255));
-		} else {
-			log.trace("Turning lights off");
-			setAllLights(0);
-		}
+	void draw(LightParams p) {
 		globalTime++;
-
 		processAudio();
+		// Maybe handle LightParams here somehow?
+		// p
+
+		// Light debug:
+		// if (derp) {
+		// if (p.isOn()) {
+		// 	log.trace("Turning lights on");
+		// 	setAllLights(color(255,255,255));
+		// } else {
+		// 	log.trace("Turning lights off");
+		// 	setAllLights(0);
+		// }
+		// derp = !derp;
+
+
 		doArt();
-	  // mapDrawingToLights(); // lights[][] -> pixel[]
 
-	  // Set some random pixel to full white:
-	  //int x = (int)random(totalPixels);
-	  //p[x]  = 0x00ffffff;
-
-	  // Draw colors from pixel[] to the lights:
+		// REQUIRED CODE:
+		mapDrawingToLights(); // lights[][] -> pixel[]
 		drawLEDs(); // draws pixel[] to the LEDs.
-
-	  // Set the random pixel back to black for the next pass:
-	  //p[x]  = 0;
+		// YUP.
 	}
 
 	void exit()
@@ -209,7 +212,7 @@ public class LightsController implements Runnable {
 	    // colorMode(HSB, 255);
 	    // color theColor = color(roundedVal, 255, 255);
 
-			int theColor = Color.HSBtoRGB(i/255, 255/255, 255/255);
+			int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
 	    // color theColor = color(globalTime%255, 255, 255);
 	    // color theColor = color(roundedVal, roundedVal, roundedVal);
 	    // setOneRing(i, theColor);
