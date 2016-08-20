@@ -1,6 +1,6 @@
 
 const RGB_MAX = 255
-const HUE_MAX = 360
+const HUE_MAX = 255
 const SV_MAX = 100
 
 var colorsys = window.colorsys = {}
