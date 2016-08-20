@@ -42,41 +42,54 @@ $(document).ready(function() {
 
   // Add an event listener on the canvas to catch
   // mouse movements:
-  $('.canvas').on('mousemove', function(event) {
-    // This block runs when the mouse moves over the canvas
-
-    var x = event.offsetX;
-    var y = event.offsetY;
-
-    var xscale = x/window.innerWidth;
-    var yscale = 1-y/window.innerHeight;
-
-    // console.log('mousemove event: ', x, y, hue, val);
-
-    var color = Color.HSVtoRGB(xscale, 1, yscale);
-    // console.log('color: ', color, Color.getCSSColor());
-    $('.canvas').css('background-color', Color.getCSSColor());
-
-    // $('.canvas').off('mousemove');
-
-    theParams.hue1 = Math.round(xscale*255);
-    theParams.hue2 = Math.round(yscale*255);
-
-    $.ajax({
-       url: 'http://localhost:8080/rs/lights',
-       data: JSON.stringify(theParams),
-       error: function(e) {
-          console.log('Error on AJAX', e);
-       },
-      //  dataType: 'jsonp',
-       success: function(data) {
-          // console.log('data: ', data);
-       },
-       type: 'PUT'
-    });
-
-  })
+  $('.canvas').on('touchmove mousemove', handleMovement);
 });
+
+function handleMovement(event) {
+
+  event.preventDefault()
+  // This block runs when the mouse moves over the canvas
+
+  var x = 0;
+  var y = 0;
+  console.log('event: ', event);
+
+  if (event.type === 'touchmove') {
+    x = event.touches[0].pageX;
+    y = event.touches[0].pageY;
+  } else {
+    x = event.offsetX;
+    y = event.offsetY;
+  }
+
+  var xscale = x/window.innerWidth;
+  var yscale = 1-y/window.innerHeight;
+
+  // console.log('mousemove event: ', x, y, hue, val);
+
+  var color = Color.HSVtoRGB(xscale, 1, yscale);
+  // console.log('color: ', color, Color.getCSSColor());
+  $('.canvas').css('background-color', Color.getCSSColor());
+
+  // $('.canvas').off('mousemove');
+
+  theParams.hue1 = Math.round(xscale*255);
+  theParams.hue2 = Math.round(yscale*255);
+
+  $.ajax({
+     url: 'rs/lights',
+     data: JSON.stringify(theParams),
+     error: function(e) {
+        console.log('Error on AJAX', e);
+     },
+    //  dataType: 'jsonp',
+     success: function(data) {
+        // console.log('data: ', data);
+     },
+     type: 'PUT'
+  });
+
+}
 
 
 // h, s, and v should be decimal values between 0 and 1

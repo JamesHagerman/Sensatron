@@ -1,3 +1,7 @@
+body {
+  scroll: none
+}
+
 .content,
 .canvas {
   width: 100%;
