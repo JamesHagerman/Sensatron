@@ -207,7 +207,7 @@ public class LightsController implements Runnable {
 		int shiftedTime = (int)(globalTime*10.0f)%255;
 
 		int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
-		log.info("Shifted time: " + shiftedTime);
+		// log.info("Shifted time: " + shiftedTime);
 		log.info("current strand: " + currentStrand);
 
 		for(int i = 0; i < STRAND_LENGTH; i++) {
