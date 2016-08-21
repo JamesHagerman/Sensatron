@@ -14,6 +14,16 @@ import TotalControl.TotalControl;
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 
+// Added by james as a hack for various things:
+import java.io.OutputStream;
+import java.util.*;
+import java.util.stream.*;
+import java.lang.Float.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+
+
 public class LightsController implements Runnable {
 
 	private final Thread renderThread = new Thread(this);
@@ -61,6 +71,14 @@ public class LightsController implements Runnable {
 	float goodFFTLog[] = new float[STRAND_LENGTH];
 	int fftPeaks[] = new int[1]; // redefined in setup()
 	int fftLogPeaks[] = new int[1]; // redefined in setup()
+
+	// NETWORK TO LIGHTS:
+	Socket socket = null;
+	int sockBufferSize = 600*3;
+	byte[] bytes = new byte[sockBufferSize];
+	OutputStream socketOut = null;
+	boolean attemptNetworkLights = true;
+	boolean networkLightsConnected = false;
 
 	// Some Envelopes:
 	// TODO: Build some curves?
@@ -222,6 +240,16 @@ public class LightsController implements Runnable {
 		} catch (UnsatisfiedLinkError e) {
 			log.error("Couldn't find TCL native library. " + e);
 		}
+
+		// Attempt to connect to network display
+		if (attemptNetworkLights) {
+			log.info("Trying to connect to lights server display...");
+			openSocket();
+		} else {
+			log.info("Not trying to connect to lights server display...");
+		}
+
+
 		renderThread.start();
 	}
 
@@ -273,6 +301,7 @@ public class LightsController implements Runnable {
 	{
 		stop();
 		log.info("Trying to stop everything gracefully...");
+		closeSocket();
 		in.close();
 		TotalControl.close();
 		log.info("Done! Exiting!");
@@ -280,6 +309,11 @@ public class LightsController implements Runnable {
 
 
 	// Audio handler:
+	public int compare(int i, int j) {
+		// This is inverted...  with *-1
+		return Float.compare(goodFFTBuckets[i], goodFFTBuckets[j]) * -1;
+	}
+
 	void processAudio() {
 	  // AUDIO DRAW:
 	  fft.forward( in.mix );
@@ -295,6 +329,12 @@ public class LightsController implements Runnable {
 	    ledCount++; // increment for the next pass goodFFTLog
 	  }
 
+		// log.info("FFT Buckets: " + Arrays.toString(goodFFTBuckets));
+		fftPeaks = IntStream.range(0, goodFFTBuckets.length )
+                .boxed().sorted((i, j) -> compare(i, j) )
+                .mapToInt(ele -> ele).toArray();
+		// log.info("FFT SORTED: " + Arrays.toString(fftPeaks));
+
 
 	  ledCount = 0; // Reset ledCount
 	  // since logarithmically spaced averages are not equally spaced
@@ -307,11 +347,17 @@ public class LightsController implements Runnable {
 	    }
 	    ledCount++; // increment for the next pass
 	  }
+
+		// log.info("FFT Log Buckets. " + Arrays.toString(goodFFTLog));
+		fftLogPeaks = IntStream.range(0, goodFFTLog.length )
+                .boxed().sorted((i, j) -> compare(i, j) )
+                .mapToInt(ele -> ele).toArray();
+		// log.info("FFT Log SORTED: " + Arrays.toString(fftLogPeaks));
 	}
 
 
 	void doArt(LightParams p) {
-		log.info("LightsController thinks: " + p);
+		// log.info("LightsController thinks: " + p);
 
 		if (!p.isOn()) {
 			setAllLights(0);
@@ -450,6 +496,51 @@ public class LightsController implements Runnable {
 		if (tcl) {
 		  TotalControl.refresh(pixels, remap);
 	  }
+		if (networkLightsConnected) {
+			socketLEDs();
+		}
+	}
+
+	void openSocket() {
+		try	{
+      Socket socket = new Socket("127.0.0.1", 3001);
+			socketOut = socket.getOutputStream();
+    }
+    catch(IOException ex){
+      log.error("Could not connect to the server!");
+			networkLightsConnected = false;
+			return;
+    }
+		networkLightsConnected = true;
+	}
+	void closeSocket() {
+		if (networkLightsConnected) {
+			try	{
+				socketOut.close();
+				socket.close();
+	    }
+	    catch(IOException ex){
+	      log.error("Could not close connection to server!");
+	    }
+		}
+
+	}
+	void socketLEDs(){
+		if (networkLightsConnected) {
+			try	{
+				int j = 0;
+				for (int i = 0; i < sockBufferSize; i+=3) {
+					bytes[i] = (byte)(pixels[j] & 0xff);
+					bytes[i+1] = (byte)((pixels[j] >> 8) & 0xff);
+					bytes[i+2] = (byte)((pixels[j] >> 16) & 0xff);
+					j++;
+				}
+				socketOut.write(bytes, 0, sockBufferSize);
+	    }
+	    catch(IOException ex){
+	      log.error("Could not send to server!");
+	    }
+		}
 	}
 
 
@@ -510,4 +601,7 @@ public class LightsController implements Runnable {
 	public void setMediaPath(String mediaPath) {
 		this.mediaPath = mediaPath;
 	}
+
+
+
 }

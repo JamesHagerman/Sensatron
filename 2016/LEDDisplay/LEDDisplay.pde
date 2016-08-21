@@ -44,8 +44,8 @@ void draw()
   background(150);
   // Get color data from a connected client:
   colorServer.getColors(p);
-  //mapLightsToDrawing();
-  //drawLights();
+  mapLightsToDrawing();
+  drawLights();
 }
 
 public void buildRemapArray() {
