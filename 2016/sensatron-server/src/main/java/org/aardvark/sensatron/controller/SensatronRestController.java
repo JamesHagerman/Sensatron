@@ -75,6 +75,22 @@ public class SensatronRestController {
 		return gson.toJson(lightParams);
 	}
 
+	@RequestMapping(value = "/trigger", method = RequestMethod.POST)
+	public String trigger(@RequestParam(value = "which", required = true) Integer which) {
+		switch (which) {
+		case 1:
+			lightsController.trig1();
+			break;
+		case 2:
+			lightsController.trig2();
+			break;
+		case 3:
+			lightsController.trigAR();
+			break;
+		}
+		return "";
+	}
+	
 	@RequestMapping(value = "/lights", method = RequestMethod.PUT)
 	public String putSomething(@RequestBody String request, @RequestParam(value = "version", required = false, defaultValue = "1") int version) {
 

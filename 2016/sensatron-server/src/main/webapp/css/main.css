@@ -99,3 +99,28 @@ div.ui-slider {
 .mode-button-on {
 	border-color: white;
 }
+
+#trigger1 {
+	background: radial-gradient(closest-side, red, black);
+	position: absolute;
+	top: 4em;
+	left: 0em;
+	min-height: 3.5em;
+	min-width: 3.5em;
+}
+#trigger2 {
+	background: radial-gradient(closest-side, green, black);
+	position: absolute;
+	top: 8em;
+	left: 0em;
+	min-height: 3.5em;
+	min-width: 3.5em;
+}
+#trigger3 {
+	background: radial-gradient(closest-side, blue, black);
+	position: absolute;
+	top: 4em;
+	right: 0em;
+	min-height: 3.5em;
+	min-width: 3.5em;
+}

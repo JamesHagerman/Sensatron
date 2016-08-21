@@ -19,6 +19,10 @@ function updateLights(params) {
 	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
 }
 
+function triggerLights(whichTrigger) {
+	$.ajax('rs/trigger', {data: {which: whichTrigger}, method: 'POST'});
+}
+
 function toggle() {
   console.log('toggle hit!');
 	updateLights({toggle: 'true'});
@@ -74,6 +78,10 @@ function setMode(event) {
 	}
 }
 
+function pressTrigger(event) {
+	var which = $(this).data("trigger");
+	triggerLights(which);
+}
 // Entry point to the whole show:
 // Note: This uses jQuery:
 $(document).ready(function() {
@@ -92,6 +100,7 @@ $(document).ready(function() {
   $('#saturation').change(setSliderValue);
   $('#slider4').change(setSliderValue);
   $('.mode-button').click(setMode);
+  $('.trigger-button').on("vmousedown", pressTrigger);
   
   setInterval(updateLights, 500);
 });
