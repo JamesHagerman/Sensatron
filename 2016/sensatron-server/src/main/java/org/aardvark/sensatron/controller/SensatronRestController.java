@@ -1,5 +1,7 @@
 package org.aardvark.sensatron.controller;
 
+import java.io.IOException;
+
 import org.aardvark.sensatron.lights.LightsController;
 import org.aardvark.sensatron.model.LightParams;
 import org.apache.log4j.Logger;
@@ -25,13 +27,14 @@ public class SensatronRestController {
 	private static final Logger logger = Logger.getLogger(SensatronRestController.class);
 
 	@RequestMapping(value = "/lights", method = RequestMethod.GET)
-	public String getSomething(@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
+	public String getLightParams(@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
 		// Return the current params:
 		return gson.toJson(lightsController.getParams());
 	}
 
 	@RequestMapping(value = "/lights", method = RequestMethod.POST)
-	public String postSomething(@RequestParam(value = "toggle", required = false) Boolean toggle,
+	public String setLightParams(@RequestParam(value = "toggle", required = false) Boolean toggle,
+								@RequestParam(value = "flashlight", required = false) Boolean flashlight,
 								@RequestParam(value = "hue1", required = false) Integer hue1,
 								@RequestParam(value = "hue2", required = false) Integer hue2) {
 		LightParams lightParams = lightsController.getParams();
@@ -40,6 +43,13 @@ public class SensatronRestController {
 				lightParams.setOn(false);
 			} else {
 				lightParams.setOn(true);
+			}
+		}
+		if (flashlight != null && flashlight) {
+			if (lightParams.isFlashlight()) {
+				lightParams.setFlashlight(false);
+			} else {
+				lightParams.setFlashlight(true);
 			}
 		}
 		if (hue1 != null) {
@@ -118,6 +128,20 @@ public class SensatronRestController {
 		if (logger.isDebugEnabled()) {
 			logger.debug("result: '" + response + "'");
 			logger.debug("End putSomething");
+		}
+	}
+	
+	@RequestMapping(value = "/reboot", method = RequestMethod.POST)
+	public String reboot() {
+		try {
+			Runtime.getRuntime().exec("notepad");  // I don't know if 'shutdown' works in cygwin, but I don't want to find out
+//			Runtime.getRuntime().exec("shutdown -r now");  // The real shutdown command (or something like it)
+			
+			// Probably don't actually have time to return anything... but we might as well try.
+			return "Shutting down...";
+		} catch (IOException e) {
+			logger.error("Couldn't shut down", e);
+			return e.toString();
 		}
 	}
 
