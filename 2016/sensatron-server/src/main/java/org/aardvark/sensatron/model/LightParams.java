@@ -3,9 +3,11 @@ package org.aardvark.sensatron.model;
 import java.util.Arrays;
 
 public class LightParams implements Cloneable {
-	
+
 	public static final int MODE_SPECTRUM = 1;
-	
+	public static final int MODE_BLOBS = 2;
+	public static final int MODE_FFT = 3;
+
 	private boolean on = true;
 	private boolean flashlight;
 	private int mode = MODE_SPECTRUM;

@@ -2,6 +2,7 @@ SERVICE_URL = 'rs/lights';
 
 var theParams = {
    'on': true,
+   'flashlight': false,
    'mode': 4,
    'hue1': 2,
    'hue2': 3,
@@ -66,7 +67,7 @@ $(document).ready(function() {
   // Add an event listener on the canvas to catch
   // mouse movements:
   $('.canvas').on('touchmove mousemove', handleMovement);
-  
+
   $('.hue-slider').change(setHue);
 });
 

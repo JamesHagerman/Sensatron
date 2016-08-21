@@ -59,6 +59,31 @@ public class LightsController implements Runnable {
 	int ledCount = 0;
 	float goodFFTBuckets[] = new float[STRAND_LENGTH];
 	float goodFFTLog[] = new float[STRAND_LENGTH];
+	int fftPeaks[] = new int[1]; // redefined in setup()
+	int fftLogPeaks[] = new int[1]; // redefined in setup()
+
+	// AnimationBlob states:
+	int blobCount = STRAND_LENGTH;
+	int blobParamCount = 2;
+	int blobs[][] = new int[blobCount][blobParamCount];
+	void initBlobs() {
+		for (int i = 0; i < blobCount; i++) {
+			blobs[i][0] = 0; // 0 holds the size of the blob
+			blobs[i][1] = Color.HSBtoRGB((i/(float)blobCount)*255, 1.0f, 1.0f); // 1 holds the color
+		}
+	}
+
+
+	void calculateBlobSize(int blobIndex) {
+		blobs[blobIndex][0] = Math.round(goodFFTLog[blobIndex]);
+	}
+
+	void updateBlobs() {
+		for (int i = 0; i < blobCount; i++) {
+			calculateBlobSize(i);
+		}
+	}
+
 
 	// DEBUG:
 	boolean derp = false;
@@ -71,11 +96,19 @@ public class LightsController implements Runnable {
 		  in.enableMonitoring();
 			fft = new FFT( in.bufferSize(), in.sampleRate() );
 		  fftLog = new FFT( in.bufferSize(), in.sampleRate() );
+
 		  fftLog.logAverages( 10, 8 );
 			log.info("fftLog.avgSize(): " + fftLog.avgSize());
+
+			// Redefine our peaks array:
+			fftPeaks = new int[fft.specSize()];
+			fftLogPeaks = new int[fftLog.avgSize()];
+
+
 			if (in.isMonitoring()) {
 				log.info("Audio should be monitoring...");
 			}
+
 		} catch(Exception e) {
 			log.error("Couldn't open audio? " + e);
 		}
@@ -197,6 +230,8 @@ public class LightsController implements Runnable {
 
 
 	void doArt(LightParams p) {
+		log.info("LightsController thinks: " + p);
+
 		if (!p.isOn()) {
 			setAllLights(0);
 			return;
@@ -205,43 +240,47 @@ public class LightsController implements Runnable {
 			setAllLights(0xffffff);
 			return;
 		}
-		
+
 		switch (p.getMode()) {
-		case LightParams.MODE_SPECTRUM:
-			float saturation = p.getSaturation() / 100f;
-			int start = p.getHue1();
-			int step = (p.getHue2() - start) / STRAND_LENGTH;
-			for (int strand = 0; strand < STRANDS; strand++) {
-				for (int light = 0; light < STRAND_LENGTH; light++) {
-					float hue = (start + (step * light)) / 255f;
-					setOneLight(strand, light, Color.HSBtoRGB(hue, saturation, 1f));
+			case LightParams.MODE_SPECTRUM:
+				float saturation = p.getSaturation() / 100f;
+				int start = p.getHue1();
+				int step = (p.getHue2() - start) / STRAND_LENGTH;
+				for (int strand = 0; strand < STRANDS; strand++) {
+					for (int light = 0; light < STRAND_LENGTH; light++) {
+						float hue = (start + (step * light)) / 255f;
+						setOneLight(strand, light, Color.HSBtoRGB(hue, saturation, 1f));
+					}
 				}
-			}
-			return;
+				return;
+			case LightParams.MODE_BLOBS:
+				updateBlobs();
+				return;
+			case LightParams.MODE_FFT:
+				// int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
+				// int signedValue = paramValue-(255/2);
+
+				// if (paramValue == 0) paramValue = 1;
+
+				// println("derp: " + paramValue);
+				// int shiftedTime = (int)(Math.sin(globalTime/10.0f)*127.0f)+127;
+				int shiftedTime = (int)(globalTime*10.0f)%255;
+
+				int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
+				// log.info("Shifted time: " + shiftedTime);
+				// log.info("current strand: " + currentStrand);
+
+				for(int i = 0; i < STRAND_LENGTH; i++) {
+					int roundedVal = Math.round(goodFFTBuckets[i])*10;
+					// int roundedVal = Math.round(goodFFTLog[i]); // *shiftedTime
+
+					int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
+					setOneRing(i, theColor);
+					// setOneSpiral(0, i, 1, theColor);
+					// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
+				}
+				return;
 		}
-	  // int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
-	  // int signedValue = paramValue-(255/2);
-
-	  // if (paramValue == 0) paramValue = 1;
-
-	  // println("derp: " + paramValue);
-	  // int shiftedTime = (int)(Math.sin(globalTime/10.0f)*127.0f)+127;
-		int shiftedTime = (int)(globalTime*10.0f)%255;
-
-		int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
-		// log.info("Shifted time: " + shiftedTime);
-		// log.info("current strand: " + currentStrand);
-
-		for(int i = 0; i < STRAND_LENGTH; i++) {
-	    // int roundedVal = Math.round(goodFFTBuckets[i])*10;
-	    int roundedVal = Math.round(goodFFTLog[i]); // *shiftedTime
-
-			int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
-	    // setOneRing(i, theColor);
-	    // setOneSpiral(0, i, 1, theColor);
-			setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
-	  }
-
 	}
 
 	//=============
