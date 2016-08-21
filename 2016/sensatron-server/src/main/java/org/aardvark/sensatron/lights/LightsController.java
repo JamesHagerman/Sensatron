@@ -62,10 +62,44 @@ public class LightsController implements Runnable {
 	int fftPeaks[] = new int[1]; // redefined in setup()
 	int fftLogPeaks[] = new int[1]; // redefined in setup()
 
+	// Some Envelopes:
+	int envMax = 255;
+	int env1Value = 0;
+	int env1Rate = 1;
+	int env2Value = 0;
+	int env2Rate = 1;
+	void trig1() {
+		env1Value = 255;
+	}
+	void trig2() {
+		env2Value = 255;
+	}
+	void updateEnv1() {
+		if (env1Value > 0) {
+			env1Value = env1Value - env1Rate;
+		}
+		if (env1Value < 0) {
+			env1Value = 0;
+		}
+	}
+	void updateEnv2() {
+		if (env2Value > 0) {
+			env2Value = env2Value - env2Rate;
+		}
+		if (env2Value < 0) {
+			env2Value = 0;
+		}
+	}
+	void updateEnv() {
+		updateEnv1();
+		updateEnv2();
+	}
+
 	// AnimationBlob states:
 	int blobCount = STRAND_LENGTH;
 	int blobParamCount = 2;
 	int blobs[][] = new int[blobCount][blobParamCount];
+	int maxBlobSize = STRAND_LENGTH/2;
 	void initBlobs() {
 		for (int i = 0; i < blobCount; i++) {
 			blobs[i][0] = 0; // 0 holds the size of the blob
@@ -73,9 +107,13 @@ public class LightsController implements Runnable {
 		}
 	}
 
-
 	void calculateBlobSize(int blobIndex) {
-		blobs[blobIndex][0] = Math.round(goodFFTLog[blobIndex]);
+
+		int newSize = Math.round(goodFFTLog[blobIndex]);
+		if (newSize > maxBlobSize) {
+			newSize = maxBlobSize;
+		}
+		blobs[blobIndex][0] = newSize;
 	}
 
 	void updateBlobs() {
@@ -271,8 +309,8 @@ public class LightsController implements Runnable {
 				// log.info("current strand: " + currentStrand);
 
 				for(int i = 0; i < STRAND_LENGTH; i++) {
-					int roundedVal = Math.round(goodFFTBuckets[i])*10;
-					// int roundedVal = Math.round(goodFFTLog[i]); // *shiftedTime
+					// int roundedVal = Math.round(goodFFTBuckets[i])*10;
+					int roundedVal = Math.round(goodFFTLog[i])*10;
 
 					int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
 					setOneRing(i, theColor);
