@@ -19,6 +19,14 @@ mvn dependency:go-offline
 
 That will tell Maven to go off and download everything it thinks it needs.
 
+## Building a .war file
+
+This will spit out a deployable `.war` file to be run inside Tomcat:
+
+```
+mvn package
+```
+
 ## Getting Audio passthrough working
 
 You've gotta modify the `sound.properties` file inside the Java directory structure. Sun got all bitchy about their pulseaudio support or something.
