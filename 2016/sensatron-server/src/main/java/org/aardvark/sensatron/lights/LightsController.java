@@ -208,7 +208,7 @@ public class LightsController implements Runnable {
 
 		int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
 		// log.info("Shifted time: " + shiftedTime);
-		log.info("current strand: " + currentStrand);
+		// log.info("current strand: " + currentStrand);
 
 		for(int i = 0; i < STRAND_LENGTH; i++) {
 	    // int roundedVal = Math.round(goodFFTBuckets[i])*10;

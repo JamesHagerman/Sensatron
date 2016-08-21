@@ -22,7 +22,7 @@
 	display: none;
 }
 .ui-slider .ui-slider-track {
-    margin-left: 15px;
+	margin-left: 15px;
 }
 
   #swatch {
@@ -32,13 +32,13 @@
     margin-left: 350px;
     background-image: none;
   }
-  .hue-slider ~ .ui-slider-track { 
+  .hue-slider ~ .ui-slider-track {
   	background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
     width: 90%;
     height: 1em;
     margin: 2em 0 2em 5%;
   }
-  .hue-slider ~ .ui-slider-track .ui-slider-handle { 
+  .hue-slider ~ .ui-slider-track .ui-slider-handle {
   	border-color: #ffffff;
   	background: #ff0000;
   	width: 3em;
@@ -46,12 +46,12 @@
   	top: 0;
   	margin-left: -1.5em;
   }
-  #saturation.ui-slider { 
+  #saturation.ui-slider {
   	background: linear-gradient(to right, black, white);
     width: 90%;
     height: 1.5em;
   }
-  #saturation .ui-slider-handle { 
+  #saturation .ui-slider-handle {
   	border-color: #ffffff;
   	background: #000000;
   	width: 3em;
@@ -59,4 +59,3 @@
   	top: -.75em;
   	margin-left: -1.5em;
   }
-  
