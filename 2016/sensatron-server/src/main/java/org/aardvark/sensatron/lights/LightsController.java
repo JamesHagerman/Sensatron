@@ -158,7 +158,10 @@ public class LightsController implements Runnable {
 	void exit()
 	{
 		stop();
+		log.info("Trying to stop everything gracefully...");
+		in.close();
 		TotalControl.close();
+		log.info("Done! Exiting!");
 	}
 
 
@@ -200,26 +203,23 @@ public class LightsController implements Runnable {
 	  // if (paramValue == 0) paramValue = 1;
 
 	  // println("derp: " + paramValue);
-	  int shiftedTime = Math.abs((int)Math.sin(globalTime)*p.getHue1());
+	  // int shiftedTime = (int)(Math.sin(globalTime/10.0f)*127.0f)+127;
+		int shiftedTime = (int)(globalTime*10.0f)%255;
 
-	  // for(int i = 0; i < STRAND_LENGTH; i++) {
+		int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
+		log.info("Shifted time: " + shiftedTime);
+		log.info("current strand: " + currentStrand);
+
 		for(int i = 0; i < STRAND_LENGTH; i++) {
-
 	    // int roundedVal = Math.round(goodFFTBuckets[i])*10;
 	    int roundedVal = Math.round(goodFFTLog[i]); // *shiftedTime
 
-	    // colorMode(HSB, 255);
-	    // color theColor = color(roundedVal, 255, 255);
-
 			int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
-	    // color theColor = color(globalTime%255, 255, 255);
-	    // color theColor = color(roundedVal, roundedVal, roundedVal);
-	    setOneRing(i, theColor);
+	    // setOneRing(i, theColor);
 	    // setOneSpiral(0, i, 1, theColor);
-	    // colorMode(RGB, 255);
+			setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
 	  }
 
-		// setOneStrand(0, Color.HSBtoRGB(64/255.0f, 1.0f, 1.0f) );
 	}
 
 	//=============
