@@ -197,6 +197,28 @@ public class LightsController implements Runnable {
 
 
 	void doArt(LightParams p) {
+		if (!p.isOn()) {
+			setAllLights(0);
+			return;
+		}
+		if (p.isFlashlight()) {
+			setAllLights(0xffffff);
+			return;
+		}
+		
+		switch (p.getMode()) {
+		case LightParams.MODE_SPECTRUM:
+			float saturation = p.getSaturation() / 100f;
+			int start = p.getHue1();
+			int step = (p.getHue2() - start) / STRAND_LENGTH;
+			for (int strand = 0; strand < STRANDS; strand++) {
+				for (int light = 0; light < STRAND_LENGTH; light++) {
+					float hue = (start + (step * light)) / 255f;
+					setOneLight(strand, light, Color.HSBtoRGB(hue, saturation, 1f));
+				}
+			}
+			return;
+		}
 	  // int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
 	  // int signedValue = paramValue-(255/2);
 

@@ -1,4 +1,4 @@
-SERVICE_URL = 'rs/lights'
+SERVICE_URL = 'rs/lights';
 
 var theParams = {
    'on': true,
@@ -22,10 +22,15 @@ function toggle() {
 	updateLights({toggle: 'true'});
 }
 
+function flashlight() {
+	updateLights({flashlight: true});
+}
+
 function lightParamsCallback(settingsJSON) {
 	var settings = JSON.parse(settingsJSON);
 	allowUpdate = false;
 	$('#lightsOn').text(settings.on ? 'on' : 'off');
+	$('#flashlightOn').text(settings.flashlight ? 'on' : 'off');
 	$('#hue1').val(settings.hue1).change();
 	$('#hue2').val(settings.hue2).change();
 	allowUpdate = true;

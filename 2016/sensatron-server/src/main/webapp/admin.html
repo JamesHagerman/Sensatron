@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Sensatron</title>
+
+  <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="js/jquery-2.2.4.min.js"></script>
+  <script src="js/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/colorsys.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  function reboot() {
+	  $.ajax('rs/reboot', {method: 'POST', success: function(response) { alert(response);}});
+  }
+  </script>
+</head>
+<body>
+	<p>Lights are <span id="lightsOn"></span></p>
+	<button onclick="toggle()">Toggle Lights</button>
+	<br/>
+	<p>Flashlight Mode is <span id="flashlightOn"></span></p>
+	<button onclick="flashlight()">Toggle Flashlight</button>
+	<br/>
+	<button onclick="reboot()">Reboot</button>
+</body>
+</html>

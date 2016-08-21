@@ -4,19 +4,14 @@ import java.util.Arrays;
 
 public class LightParams implements Cloneable {
 	
-	private boolean on;
-	private int mode;
-	public int getMode() {
-		return mode;
-	}
-
-	public void setMode(int mode) {
-		this.mode = mode;
-	}
-
-	private int hue1;
-	private int hue2;
-	private int saturation;
+	public static final int MODE_SPECTRUM = 1;
+	
+	private boolean on = true;
+	private boolean flashlight;
+	private int mode = MODE_SPECTRUM;
+	private int hue1 = 0;
+	private int hue2 = 255;
+	private int saturation = 100;
 	private int slider4;
 	private int[] pitchSliders = new int[12];
 
@@ -30,13 +25,22 @@ public class LightParams implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "LightParams [on=" + on + ", mode=" + mode + ", hue1=" + hue1 + ", hue2=" + hue2 + ", saturation=" + saturation
-				+ ", slider4=" + slider4 + ", pitchSliders=" + Arrays.toString(pitchSliders) + "]";
+		return "LightParams [on=" + on + ", flashlight=" + flashlight + ", mode=" + mode + ", hue1=" + hue1 + ", hue2="
+				+ hue2 + ", saturation=" + saturation + ", slider4=" + slider4 + ", pitchSliders="
+				+ Arrays.toString(pitchSliders) + "]";
 	}
 
 	@Override
 	public LightParams clone() throws CloneNotSupportedException {
 		return (LightParams) super.clone();
+	}
+
+	public int getMode() {
+		return mode;
+	}
+
+	public void setMode(int mode) {
+		this.mode = mode;
 	}
 
 	public int getHue1() {
@@ -77,5 +81,13 @@ public class LightParams implements Cloneable {
 
 	public void setPitchSliders(int[] pitchSliders) {
 		this.pitchSliders = pitchSliders;
+	}
+
+	public boolean isFlashlight() {
+		return flashlight;
+	}
+
+	public void setFlashlight(boolean flashlight) {
+		this.flashlight = flashlight;
 	}
 }
