@@ -6,6 +6,19 @@ mvn jetty:run
 
 Then go to `http://localhost:8080` in your browser to see the control site!
 
+
+## Going offline:
+
+Because Maven manages dependencies on it's own by downloading them from the internet when it needs them, to run this thing on Playa means you'll have to tell Maven to download all of it's dependencies beforehand.
+
+You can do that by making sure you're online, changing to the `2016/sensatron-server/` directory and running:
+
+```
+mvn dependency:go-offline
+```
+
+That will tell Maven to go off and download everything it thinks it needs.
+
 ## Getting Audio passthrough working
 
 You've gotta modify the `sound.properties` file inside the Java directory structure. Sun got all bitchy about their pulseaudio support or something.
