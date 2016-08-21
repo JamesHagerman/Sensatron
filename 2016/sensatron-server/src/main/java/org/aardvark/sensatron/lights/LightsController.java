@@ -63,36 +63,78 @@ public class LightsController implements Runnable {
 	int fftLogPeaks[] = new int[1]; // redefined in setup()
 
 	// Some Envelopes:
+	// TODO: Build some curves?
+	// TODO: Build some attack curves?
+	void updateEnv(int t) {
+		updateEnv1(t);
+		updateEnv2(t);
+		updateAR(t);
+	}
+
 	int envMax = 255;
 	int env1Value = 0;
 	int env1Rate = 1;
 	int env2Value = 0;
-	int env2Rate = 1;
+	int env2Rate = 10;
 	void trig1() {
 		env1Value = 255;
 	}
 	void trig2() {
 		env2Value = 255;
 	}
-	void updateEnv1() {
+	void updateEnv1(int t) {
 		if (env1Value > 0) {
 			env1Value = env1Value - env1Rate;
 		}
 		if (env1Value < 0) {
 			env1Value = 0;
 		}
+		if (env1Value > envMax) {
+			env1Value = envMax;
+		}
 	}
-	void updateEnv2() {
+	void updateEnv2(int t) {
 		if (env2Value > 0) {
 			env2Value = env2Value - env2Rate;
 		}
 		if (env2Value < 0) {
 			env2Value = 0;
 		}
+		if (env2Value > envMax) {
+			env2Value = envMax;
+		}
 	}
-	void updateEnv() {
-		updateEnv1();
-		updateEnv2();
+
+	// AR Envelope
+	int arValue = 0;
+	int arState = 0; //-1 = settled, 0=A, 1=R
+	int aRate = 1;
+	int rRate = 10;
+	void trigAR() {
+		arState = 0; // attack mode
+	}
+	void updateAR(int t) {
+
+		if (arState == 0) {
+			arValue = arValue + aRate;
+		}
+		if (arState == 1) {
+			arValue = arValue - rRate;
+		}
+		if (arValue < 0) {
+			arValue = 0;
+		}
+		if (arValue > envMax) {
+			arValue = envMax;
+		}
+
+		// Change state if needed:
+		if (arState == 0 && arValue >= envMax) {
+			arState = 1; // release mode
+		}
+		if (arState == 1 && arValue <= 0) {
+			arState = -1; //settled
+		}
 	}
 
 	// AnimationBlob states:
@@ -203,7 +245,8 @@ public class LightsController implements Runnable {
 	}
 
 	void draw(LightParams p) {
-		globalTime++;
+		globalTime++; // TODO base this on REAL time, not frames
+		updateEnv(globalTime);
 		processAudio();
 
 		// Light debug:
