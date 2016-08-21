@@ -242,12 +242,7 @@ public class LightsController implements Runnable {
 		}
 
 		// Attempt to connect to network display
-		if (attemptNetworkLights) {
-			log.info("Trying to connect to lights server display...");
-			openSocket();
-		} else {
-			log.info("Not trying to connect to lights server display...");
-		}
+		openSocket();
 
 
 		renderThread.start();
@@ -502,16 +497,21 @@ public class LightsController implements Runnable {
 	}
 
 	void openSocket() {
-		try	{
-      Socket socket = new Socket("127.0.0.1", 3001);
-			socketOut = socket.getOutputStream();
-    }
-    catch(IOException ex){
-      log.error("Could not connect to the server!");
-			networkLightsConnected = false;
-			return;
-    }
-		networkLightsConnected = true;
+		if (attemptNetworkLights) {
+			log.info("Trying to connect to lights server display...");
+			try	{
+	      Socket socket = new Socket("127.0.0.1", 3001);
+				socketOut = socket.getOutputStream();
+	    }
+	    catch(IOException ex){
+	      log.error("Could not connect to the server!");
+				networkLightsConnected = false;
+				return;
+	    }
+			networkLightsConnected = true;
+		} else {
+			log.info("Not trying to connect to lights server display...");
+		}
 	}
 	void closeSocket() {
 		if (networkLightsConnected) {
@@ -539,6 +539,8 @@ public class LightsController implements Runnable {
 	    }
 	    catch(IOException ex){
 	      log.error("Could not send to server!");
+				networkLightsConnected = false;
+				return;
 	    }
 		}
 	}
