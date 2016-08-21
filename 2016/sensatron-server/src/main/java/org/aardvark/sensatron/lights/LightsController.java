@@ -76,10 +76,10 @@ public class LightsController implements Runnable {
 	int env1Rate = 1;
 	int env2Value = 0;
 	int env2Rate = 10;
-	void trig1() {
+	public void trig1() {
 		env1Value = 255;
 	}
-	void trig2() {
+	public void trig2() {
 		env2Value = 255;
 	}
 	void updateEnv1(int t) {
@@ -110,7 +110,7 @@ public class LightsController implements Runnable {
 	int arState = 0; //-1 = settled, 0=A, 1=R
 	int aRate = 1;
 	int rRate = 10;
-	void trigAR() {
+	public void trigAR() {
 		arState = 0; // attack mode
 	}
 	void updateAR(int t) {
