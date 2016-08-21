@@ -14,6 +14,7 @@ allowUpdate = true;
 
 function updateLights(params) {
   console.log('update lights');
+  	if (params == null) params = {};
 	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
 }
 
@@ -33,14 +34,17 @@ function lightParamsCallback(settingsJSON) {
 	$('#flashlightOn').text(settings.flashlight ? 'on' : 'off');
 	$('#hue1').val(settings.hue1).change();
 	$('#hue2').val(settings.hue2).change();
+	$('#saturation').val(settings.saturation).change();
+	$('#slider4').val(settings.slider4).change();
+	setModeButtonOn(settings.mode);
 	allowUpdate = true;
 }
 
-  function updateHue(event) {
-    var hue = $(this).val();
-    var hex = colorsys.hsv2Hex(hue, 100, 100);
-    $(this).parent().find('.ui-slider-handle').css( "background-color", hex );
-  }
+function setModeButtonOn(mode) {
+	$('.mode-button').removeClass("mode-button-on");
+	$('#mode-' + mode).addClass("mode-button-on");
+}
+
   function setHue(event) {
     var hue = $(this).val();
     var hex = colorsys.hsv2Hex(hue, 100, 100);
@@ -52,6 +56,22 @@ function lightParamsCallback(settingsJSON) {
     	updateLights(params)
     }
   }
+  
+function setSliderValue(event) {
+	if (allowUpdate) {
+  	  	var sliderId = $(this).prop('id');
+    	var params = {}
+    	params[sliderId] = $(this).val();
+    	updateLights(params)
+	}
+}
+
+function setMode(event) {
+	var mode = $(this).data("mode");
+	if (allowUpdate) {
+		updateLights({mode: mode});
+	}
+}
 
 // Entry point to the whole show:
 // Note: This uses jQuery:
@@ -68,6 +88,11 @@ $(document).ready(function() {
   $('.canvas').on('touchmove mousemove', handleMovement);
   
   $('.hue-slider').change(setHue);
+  $('#saturation').change(setSliderValue);
+  $('#slider4').change(setSliderValue);
+  $('.mode-button').click(setMode);
+  
+  setInterval(updateLights, 500);
 });
 
 function handleMovement(event) {

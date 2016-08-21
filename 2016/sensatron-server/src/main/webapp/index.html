@@ -13,10 +13,7 @@
   <script src="js/colorsys.js"></script>
   <script src="js/main.js"></script>
 </head>
-<body>
-	<p>Lights are <span id="lightsOn"></span></p>
-	<button onclick="toggle()">Toggle Lights</button>
-	<br/>
+<body class="sensatron">
 	<div>
 	<label for="hue1" class="ui-hidden-accessible">Hue 1:</label>
 	<input type="range" class="hue-slider" name="hue1" id="hue1" min="0" max="255" value="0">
@@ -28,7 +25,20 @@
 	</div>
 	<br/>
 	<div id="centerPanel">
-	<img src="img/mode_button_crackle.svg"/>
+	<img id="mode-1" data-mode="1" class="mode-button mode-button-on" src="assets/mode_button_bottom_slider.svg"/>
+	<img id="mode-2" data-mode="2" class="mode-button mode-button-right" src="assets/mode_button_reset.svg"/>
+	<img id="mode-3" data-mode="3" class="mode-button mode-button-bottom" src="assets/mode_button_crackle.svg"/>
+	<img id="mode-4" data-mode="4" class="mode-button mode-button-bottom mode-button-right" src="assets/mode_button_accelerometer.svg"/>
+	</div>
+	<br/>
+	<div>
+	<label for="saturation" class="ui-hidden-accessible">Saturation:</label>
+	<input type="range" name="saturation" id="saturation" min="0" max="100" value="0">
+	</div>
+	<br/>
+	<div>
+	<label for="slider4" class="ui-hidden-accessible">Slider 4:</label>
+	<input type="range" name="slider4" id="slider4" min="0" max="100" value="0">
 	</div>
 </body>
 </html>
