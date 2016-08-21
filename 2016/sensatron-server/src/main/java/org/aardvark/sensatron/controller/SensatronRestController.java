@@ -134,12 +134,12 @@ public class SensatronRestController {
 	@RequestMapping(value = "/shutdown", method = RequestMethod.POST)
 	public String shutdown() {
 		try {
-			Runtime.getRuntime().exec("shutdown -h now");  // I don't know if 'shutdown' works in cygwin, but I don't want to find out
+			Runtime.getRuntime().exec("sudo shutdown -h now");  // I don't know if 'shutdown' works in cygwin, but I don't want to find out
 	//			Runtime.getRuntime().exec("shutdown -r now");  // The real shutdown command (or something like it)
 
 			// Probably don't actually have time to return anything... but we might as well try.
 
-			System.exit(0);
+			// System.exit(0);
 			return "Shutting down...";
 		} catch (IOException e) {
 			logger.error("Couldn't shutdown...", e);
@@ -150,12 +150,12 @@ public class SensatronRestController {
 	@RequestMapping(value = "/reboot", method = RequestMethod.POST)
 	public String reboot() {
 		try {
-			Runtime.getRuntime().exec("shutdown -r now");  // I don't know if 'shutdown' works in cygwin, but I don't want to find out
+			Runtime.getRuntime().exec("sudo shutdown -r now");  // I don't know if 'shutdown' works in cygwin, but I don't want to find out
 //			Runtime.getRuntime().exec("shutdown -r now");  // The real shutdown command (or something like it)
 
 			// Probably don't actually have time to return anything... but we might as well try.
 
-			System.exit(0);
+			// System.exit(0);
 			return "Rebooting...";
 		} catch (IOException e) {
 			logger.error("Couldn't reboot...", e);
