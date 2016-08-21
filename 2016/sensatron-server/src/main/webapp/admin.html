@@ -16,15 +16,22 @@
   function reboot() {
 	  $.ajax('rs/reboot', {method: 'POST', success: function(response) { alert(response);}});
   }
+  function shutdown() {
+	  $.ajax('rs/shutdown', {method: 'POST', success: function(response) { alert(response);}});
+  }
   </script>
 </head>
 <body>
+  <br/>
+  <button onclick="shutdown()">Shutdown</button>
+  <br/>
+  <button onclick="reboot()">Reboot</button>
+  <br/>
 	<p>Lights are <span id="lightsOn"></span></p>
 	<button onclick="toggle()">Toggle Lights</button>
 	<br/>
 	<p>Flashlight Mode is <span id="flashlightOn"></span></p>
 	<button onclick="flashlight()">Toggle Flashlight</button>
 	<br/>
-	<button onclick="reboot()">Reboot</button>
 </body>
 </html>
