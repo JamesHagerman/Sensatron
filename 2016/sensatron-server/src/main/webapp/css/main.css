@@ -18,11 +18,11 @@
    position: absolute;
 }
 
+div.ui-slider {
+	margin: 0;
+}
 .ui-slider input {
 	display: none;
-}
-.ui-slider .ui-slider-track {
-	margin-left: 15px;
 }
 
   #swatch {
@@ -32,30 +32,70 @@
     margin-left: 350px;
     background-image: none;
   }
+  .ui-slider-track {
+    width: 85%;
+    height: 0.8em;
+    margin: 2em 0 2em 8%;
+    border: none;
+  }
+  .hue-slider ~ .ui-slider-track .ui-slider-handle,
+  #saturation ~ .ui-slider-track .ui-slider-handle,
+  #slider4 ~ .ui-slider-track .ui-slider-handle {
+  	width: 2.5em;
+  	height: 2.5em;
+  	top: .15em;
+  	margin-left: -1.5em;
+  }
+  
   .hue-slider ~ .ui-slider-track {
   	background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
-    width: 90%;
-    height: 1em;
-    margin: 2em 0 2em 5%;
   }
   .hue-slider ~ .ui-slider-track .ui-slider-handle {
   	border-color: #ffffff;
   	background: #ff0000;
-  	width: 3em;
-  	height: 3em;
-  	top: 0;
-  	margin-left: -1.5em;
   }
-  #saturation.ui-slider {
-  	background: linear-gradient(to right, black, white);
-    width: 90%;
-    height: 1.5em;
+  #saturation ~ .ui-slider-track {
+  	background: linear-gradient(to right, white, black);
   }
-  #saturation .ui-slider-handle {
+  #saturation ~ .ui-slider-track .ui-slider-handle {
   	border-color: #ffffff;
-  	background: #000000;
-  	width: 3em;
-  	height: 3em;
-  	top: -.75em;
-  	margin-left: -1.5em;
+    background: transparent;
+    border-width: .5em;
+    width: 1.6em;
+    height: 1.6em;
   }
+  #slider4 ~ .ui-slider-track {
+  	background: black url("../assets/slider_variance.svg") no-repeat;
+  	background-size: 100% 100%;
+  	border: none;
+  }
+  #slider4 ~ .ui-slider-track .ui-slider-handle {
+  	border-color: #ffffff;
+    background: transparent;
+    border-width: .5em;
+    width: 1.6em;
+    height: 1.6em;
+  }
+  #centerPanel {
+  	position: relative;
+  	top: 2em;
+  	min-height: 15em;
+  }
+.mode-button {
+    width: 2.5em;
+    position: absolute;
+    border: .25em solid black;
+    padding: .25em;
+}
+
+.mode-button-right {
+    right: 0;
+}
+
+.mode-button-bottom {
+	bottom: 0;
+}
+
+.mode-button-on {
+	border-color: white;
+}
