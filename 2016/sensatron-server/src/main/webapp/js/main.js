@@ -99,7 +99,7 @@ $(document).ready(function() {
   $('#slider4').change(setSliderValue);
   $('.mode-button').click(setMode);
   $('.trigger-button').on("vmousedown", pressTrigger);
-  
+  $('#beat').on("vmousedown", function() { updateLights({beat: true}); });
   setInterval(updateLights, 500);
 });
 
