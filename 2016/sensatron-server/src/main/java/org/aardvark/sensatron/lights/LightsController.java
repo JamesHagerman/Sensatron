@@ -388,11 +388,32 @@ public class LightsController implements Runnable {
 
 		switch (p.getMode()) {
 			case LightParams.MODE_SPECTRUM:
-				int start = p.getHue1();
-				int step = (p.getHue2() - start) / STRAND_LENGTH;
+				int wavelength = (p.getSlider4() + 2); // lights per wave
+				float speed = 10; // lights per second
+				float frequency = speed / wavelength; // waves per second
+				float timePhase = (System.currentTimeMillis() % (int) (1000/frequency)) / (500.0f/frequency);
+				float start = p.getHue1() / 255f;
+				float end = p.getHue2() / 255f;
+				if (end < start) end += 1;
+				float span = end - start;
+				float step;
+				float phase;
 				for (int strand = 0; strand < STRANDS; strand++) {
+					if (timePhase > 1) {
+						phase = 2 - timePhase;
+						step = -1f / wavelength;
+					} else {
+						phase = timePhase;
+						step = 1f / wavelength;
+					}
 					for (int light = 0; light < STRAND_LENGTH; light++) {
-						float hue = (start + (step * light)) / 255f;
+						phase += step;
+						if (phase < 0 || phase > 1) {
+							step *= -1;
+							if (phase < 0) phase *= -1;
+							if (phase > 1) phase = 2 - phase;
+						}
+						float hue = (start + (span * phase));
 						setOneLight(strand, light, Color.HSBtoRGB(hue, saturation, 1f));
 					}
 				}
@@ -446,7 +467,7 @@ public class LightsController implements Runnable {
 				return;
 		}
 	}
-
+	
 	//=============
 	// HELPERS:
 	// Random color generator:
@@ -723,7 +744,5 @@ public class LightsController implements Runnable {
 	public void setMediaPath(String mediaPath) {
 		this.mediaPath = mediaPath;
 	}
-
-
 
 }

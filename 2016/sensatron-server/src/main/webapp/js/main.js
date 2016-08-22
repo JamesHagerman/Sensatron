@@ -14,7 +14,6 @@ allowUpdate = true;
 
 
 function updateLights(params) {
-  console.log('update lights');
   	if (params == null) params = {};
 	$.ajax(SERVICE_URL, {data: params, method: 'POST', success: lightParamsCallback});
 }
@@ -24,7 +23,6 @@ function triggerLights(whichTrigger) {
 }
 
 function toggle() {
-  console.log('toggle hit!');
 	updateLights({toggle: 'true'});
 }
 

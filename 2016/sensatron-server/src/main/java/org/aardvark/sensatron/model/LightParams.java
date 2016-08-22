@@ -14,7 +14,7 @@ public class LightParams implements Cloneable {
 	private int hue1 = 0;
 	private int hue2 = 255;
 	private int saturation = 100;
-	private int slider4;
+	private int slider4 = 10;
 	private int[] pitchSliders = new int[12];
 
 	public boolean isOn() {
