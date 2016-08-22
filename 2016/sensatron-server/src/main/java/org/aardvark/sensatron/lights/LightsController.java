@@ -395,19 +395,19 @@ public class LightsController implements Runnable {
 				// log.info("Shifted time: " + shiftedTime);
 				// log.info("current strand: " + currentStrand);
 
-				// for(int i = 0; i < STRAND_LENGTH; i++) {
-				// 	// int roundedVal = Math.round(goodFFTBuckets[i])*10;
-				// 	int roundedVal = Math.round(goodFFTLog[i])*10;
-				//
-				//   int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
-				// 	setOneRing(i, theColor);
-				// 	// setOneSpiral(0, i, 1, theColor);
-				// 	// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
-				// }
+				for(int i = 0; i < STRAND_LENGTH; i++) {
+					int roundedVal = Math.round(goodFFTBuckets[i])*10;
+					// int roundedVal = Math.round(goodFFTLog[i])*10;
+
+				  int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
+					setOneRing(i, theColor);
+					// setOneSpiral(0, i, 1, theColor);
+					// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
+				}
 
 				// debug
-				int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
-				setOneRing(currentLED, theColor);
+				// int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
+				// setOneRing(currentLED, theColor);
 
 				return;
 		}
