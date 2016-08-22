@@ -388,28 +388,27 @@ public class LightsController implements Runnable {
 				updateBlobs();
 				return;
 			case LightParams.MODE_FFT:
-				// int paramValue = 12; //((mouseY*255)/height); // convert to 0-255;
-				// int signedValue = paramValue-(255/2);
-
-				// if (paramValue == 0) paramValue = 1;
-
-				// println("derp: " + paramValue);
-				// int shiftedTime = (int)(Math.sin(globalTime/10.0f)*127.0f)+127;
 				int shiftedTime = (int)(globalTime*10.0f)%255;
 
 				int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
+				int currentLED = (int)((p.getHue2()/255.0f)*STRAND_LENGTH);
 				// log.info("Shifted time: " + shiftedTime);
 				// log.info("current strand: " + currentStrand);
 
-				for(int i = 0; i < STRAND_LENGTH; i++) {
-					// int roundedVal = Math.round(goodFFTBuckets[i])*10;
-					int roundedVal = Math.round(goodFFTLog[i])*10;
+				// for(int i = 0; i < STRAND_LENGTH; i++) {
+				// 	// int roundedVal = Math.round(goodFFTBuckets[i])*10;
+				// 	int roundedVal = Math.round(goodFFTLog[i])*10;
+				//
+				//   int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
+				// 	setOneRing(i, theColor);
+				// 	// setOneSpiral(0, i, 1, theColor);
+				// 	// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
+				// }
 
-					int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
-					setOneRing(i, theColor);
-					// setOneSpiral(0, i, 1, theColor);
-					// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
-				}
+				// debug
+				int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
+				setOneRing(currentLED, theColor);
+
 				return;
 		}
 	}
@@ -539,9 +538,9 @@ public class LightsController implements Runnable {
 			try	{
 				int j = 0;
 				for (int i = 0; i < sockBufferSize; i+=3) {
-					bytes[i] = (byte)(pixels[j] & 0xff);
+					bytes[i] = (byte)(pixels[j] >> 16 & 0xff);
 					bytes[i+1] = (byte)((pixels[j] >> 8) & 0xff);
-					bytes[i+2] = (byte)((pixels[j] >> 16) & 0xff);
+					bytes[i+2] = (byte)((pixels[j]) & 0xff);
 					j++;
 				}
 				socketOut.write(bytes, 0, sockBufferSize);

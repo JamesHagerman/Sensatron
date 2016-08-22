@@ -24,16 +24,11 @@ class ColorServer {
         int red = 0, green = 0, blue = 0;
         for (int i = 0; i < bufferSize; i+=3) {
           // print("Index: " + i/3 + " i: " + i );
-          red = colorBytes[i] + 127;
-          green = colorBytes[i+1] + 127;
-          blue = colorBytes[i+2] + 127;
-
           red = colorBytes[i] & 0xff;
           green = colorBytes[i+1] & 0xff;
           blue = colorBytes[i+2] & 0xff;
 
           // println(" r: "+ hex(red)+" g: "+hex(green)+" b: "+hex(blue));
-
           color theColor = color((int)red, (int)green, (int)blue);
           p[j] = theColor;
           j++;
