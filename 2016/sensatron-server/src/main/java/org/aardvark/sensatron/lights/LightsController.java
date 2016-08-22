@@ -95,40 +95,45 @@ public class LightsController implements Runnable {
 	int env2Value = 0;
 	int env2Rate = 10;
 	public void trig1() {
+		log.info("env1 triggered!");
 		env1Value = 255;
 	}
 	public void trig2() {
+		log.info("env2 triggered!");
 		env2Value = 255;
 	}
 	void updateEnv1(int t) {
 		if (env1Value > 0) {
 			env1Value = env1Value - env1Rate;
-		}
-		if (env1Value < 0) {
-			env1Value = 0;
-		}
-		if (env1Value > envMax) {
-			env1Value = envMax;
+			if (env1Value < 0) {
+				env1Value = 0;
+			}
+			if (env1Value > envMax) {
+				env1Value = envMax;
+			}
+			log.info(" env1 value: " + env1Value);
 		}
 	}
 	void updateEnv2(int t) {
 		if (env2Value > 0) {
 			env2Value = env2Value - env2Rate;
-		}
-		if (env2Value < 0) {
-			env2Value = 0;
-		}
-		if (env2Value > envMax) {
-			env2Value = envMax;
+			if (env2Value < 0) {
+				env2Value = 0;
+			}
+			if (env2Value > envMax) {
+				env2Value = envMax;
+			}
+			log.info(" env2 value: " + env2Value);
 		}
 	}
 
 	// AR Envelope
 	int arValue = 0;
-	int arState = 0; //-1 = settled, 0=A, 1=R
+	int arState = -1; //-1 = settled, 0=A, 1=R
 	int aRate = 1;
 	int rRate = 10;
 	public void trigAR() {
+		log.info("arTriggered!");
 		arState = 0; // attack mode
 	}
 	void updateAR(int t) {
@@ -144,6 +149,10 @@ public class LightsController implements Runnable {
 		}
 		if (arValue > envMax) {
 			arValue = envMax;
+		}
+
+		if (arState >= 0) {
+				log.info(" ar envelope value: " + arValue);
 		}
 
 		// Change state if needed:
