@@ -383,6 +383,8 @@ public class LightsController implements Runnable {
 		}
 
 		float saturation = p.getSaturation() / 100f;
+		float rotate = p.getHue2()/255.0f;
+		float rate = p.getSlider4()/100.0f;
 
 		switch (p.getMode()) {
 			case LightParams.MODE_SPECTRUM:
@@ -397,41 +399,23 @@ public class LightsController implements Runnable {
 				return;
 			case LightParams.MODE_BLOBS:
 				int pickedColor = Color.HSBtoRGB(p.getHue1()/255.0f, saturation, 1.0f);
-
 				shiftAllOut();
-
 				for(int i = 0; i < STRANDS; i++) {
-					int roundedVal = Math.round(goodFFTBuckets[i])*10;
-					// int roundedVal = Math.round(goodFFTLog[i]);
+					float rotatedHue = ( goodFFTBuckets[i]/currentPeak ) + rotate;
 
-				  int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
-					int blended = blend(theColor, pickedColor, (env1Value+env2Value+arValue)/255.0f);
+				  int theColor = Color.HSBtoRGB(rotatedHue, 1.0f, 1.0f);
+					int blended = blend(theColor, pickedColor, (env1Value+(env2Value*-1)+arValue)/255.0f);
 					setOneLight(i, 0, blended);
 				}
-
-				// debug
-				// int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
-				// setOneRing(currentLED, theColor);
 				return;
 			case LightParams.MODE_FFT:
-				// int shiftedTime = (int)(globalTime*10.0f)%255;
-
-				// int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
-				// int currentLED = (int)((p.getHue2()/255.0f)*STRAND_LENGTH);
-				// log.info("Shifted time: " + shiftedTime);
-				// log.info("current strand: " + currentStrand);
-
 				shiftAllOut();
 
-				// whitenAll(p.getHue1);
+				// int cutPoint = (int) (((env2Value+arValue)/255.0f)*STRAND_LENGTH); // 0-STRAND_LENGTH
+				// cutPoint = STRAND_LENGTH - cutPoint;
 
-				float amount = p.getHue2()/255.0f;
-				int toMix = Color.HSBtoRGB(p.getHue1(), saturation, 1.0f);
 
-				// mix(amount, toMix);
-
-				int cutPoint = (int) (((env1Value+env2Value+arValue)/255.0f)*STRAND_LENGTH); // 0-STRAND_LENGTH
-				cutPoint = STRAND_LENGTH - cutPoint;
+				int cutPoint = Math.round(rate*STRAND_LENGTH-1);
 				// log.info("Cut point: "+ cutPoint);
 				for(int i = 0; i < cutPoint; i++) {
 
@@ -440,17 +424,20 @@ public class LightsController implements Runnable {
 					// if (goodFFTBuckets[i] > currentAverage+(currentAverage*0.1)) {
 						// roundedVal = goodFFTBuckets[i];
 						// roundedVal = Math.round(goodFFTLog[i]);
-						int theColor = Color.HSBtoRGB(goodFFTBuckets[i]/currentPeak, saturation, 1.0f);
+
+						float rotatedHue = (goodFFTBuckets[i]/currentPeak) + rotate;
+						int theColor = Color.HSBtoRGB(rotatedHue, 1.0f, 1.0f);
 						setOneRing(i, theColor);
 
 						// setOneSpiral(0, i, 1, theColor);
 						// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
 					// }
-
-
-
-
 				}
+
+				// whitenAll(env1Value);
+
+				int toMix = Color.HSBtoRGB(p.getHue1()/255.0f, saturation, 1.0f);
+				blendAll(toMix, (env1Value+(env2Value*-1)+arValue)/255.0f);
 
 				// debug
 				// int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
@@ -567,35 +554,12 @@ public class LightsController implements Runnable {
 	  }
 	}
 
-	void mix(float amount, int baseColor) {
+	void blendAll(int baseColor, float amount) {
 		int lightIndex = 0;
 		for (int strand = 0; strand < STRANDS; strand++) {
 	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
 				int currentValue = lights[strand][lightNum];
-
-				// unpack to bytes
-				int r = (currentValue >> 16) & 0xff;
-				int g = (currentValue >> 8) & 0xff;
-				int b = (currentValue) & 0xff;
-
-				int rBase = (baseColor >> 16) & 0xff;
-				int gBase = (baseColor >> 8) & 0xff;
-				int bBase = (baseColor) & 0xff;
-
-				// Do some processing:
-				r = r * (int)(rBase * amount);
-				g = g * (int)(gBase * amount);
-				b = b * (int)(bBase * amount);
-
-				// limit
-				if (r > 255) r = 255;
-				if (g > 255) g = 255;
-				if (b > 255) b = 255;
-
-				// pack
-				currentValue = color(r, g, b);
-
-	      lights[strand][lightNum] = currentValue;
+	      lights[strand][lightNum] = blend(currentValue, baseColor, amount);;
 	      lightIndex++;
 	    }
 	  }
