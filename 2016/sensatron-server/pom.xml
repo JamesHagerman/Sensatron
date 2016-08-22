@@ -115,6 +115,9 @@
           <scanIntervalSeconds>30</scanIntervalSeconds>
           <systemProperties>
           </systemProperties>
+          <httpConnector>
+            <port>8080</port>
+          </httpConnector>
         </configuration>
       </plugin>
     </plugins>

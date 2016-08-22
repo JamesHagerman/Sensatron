@@ -1,0 +1,5 @@
+#!/bin/bash
+
+dnsmasq=/usr/sbin/dnsmasq.original
+
+exec $dnsmasq --addn-hosts=/etc/dnsmasq.hosts --no-hosts --log-queries `echo $@`
