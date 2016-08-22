@@ -32,6 +32,7 @@ public class LightsController implements Runnable {
 	public AudioInput in;
 	private FFT fft;
 	private FFT fftLog;
+	private BeatDetect beat;
 	public int bufferSize = 2048;
 
 	private boolean tcl = false; // Are we actually controlling the lights?
@@ -71,6 +72,8 @@ public class LightsController implements Runnable {
 	float goodFFTLog[] = new float[STRAND_LENGTH];
 	int fftPeaks[] = new int[1]; // redefined in setup()
 	int fftLogPeaks[] = new int[1]; // redefined in setup()
+	
+	LightDisplay spectrumDisplay;
 
 	// NETWORK TO LIGHTS:
 	Socket socket = null;
@@ -202,6 +205,8 @@ public class LightsController implements Runnable {
 		  in = minim.getLineIn(Minim.STEREO, bufferSize);
 		  in.enableMonitoring();
 			fft = new FFT( in.bufferSize(), in.sampleRate() );
+		  beat = new BeatDetect(in.bufferSize(), in.sampleRate());
+		  beat.detectMode(BeatDetect.SOUND_ENERGY);
 		  fftLog = new FFT( in.bufferSize(), in.sampleRate() );
 
 		  fftLog.logAverages( 10, 8 );
@@ -219,6 +224,8 @@ public class LightsController implements Runnable {
 		} catch(Exception e) {
 			log.error("Couldn't open audio? " + e);
 		}
+		
+		spectrumDisplay = new SpectrumDisplay(beat);
 
 		try {
 		  // This will build the Remapping array that will
@@ -261,7 +268,10 @@ public class LightsController implements Runnable {
 		log.info("Render thread started.");
 		while (!stopping) {
 			// Use the same LightParams throughout the rendering process, even if a new one is passed in
-			LightParams p = params;
+			LightParams p = getParams();
+			// Reset the virtual beat detector right away, so we don't miss anything
+			params.setVirtualBeat(false);
+			
 			draw(p);
 
 			try {
@@ -322,6 +332,7 @@ public class LightsController implements Runnable {
 	  // AUDIO DRAW:
 	  fft.forward( in.mix );
 	  fftLog.forward( in.mix );
+	  beat.detect(in.mix);
 
 	  ledCount = 0; // Reset ledCount
 	  for(int i = 0; i < fft.specSize(); i++)
@@ -374,34 +385,10 @@ public class LightsController implements Runnable {
 
 		switch (p.getMode()) {
 			case LightParams.MODE_SPECTRUM:
-				int wavelength = (p.getSlider4() + 2); // lights per wave
-				float speed = 10; // lights per second
-				float frequency = speed / wavelength; // waves per second
-				float timePhase = (System.currentTimeMillis() % (int) (1000/frequency)) / (500.0f/frequency);
-				float saturation = p.getSaturation() / 100f;
-				float start = p.getHue1() / 255f;
-				float end = p.getHue2() / 255f;
-				if (end < start) end += 1;
-				float span = end - start;
-				float step;
-				float phase;
+				spectrumDisplay.update(p);
 				for (int strand = 0; strand < STRANDS; strand++) {
-					if (timePhase > 1) {
-						phase = 2 - timePhase;
-						step = -1f / wavelength;
-					} else {
-						phase = timePhase;
-						step = 1f / wavelength;
-					}
 					for (int light = 0; light < STRAND_LENGTH; light++) {
-						phase += step;
-						if (phase < 0 || phase > 1) {
-							step *= -1;
-							if (phase < 0) phase *= -1;
-							if (phase > 1) phase = 2 - phase;
-						}
-						float hue = (start + (span * phase));
-						setOneLight(strand, light, Color.HSBtoRGB(hue, saturation, 1f));
+						setOneLight(strand, light, spectrumDisplay.getColor(strand, light));
 					}
 				}
 				return;

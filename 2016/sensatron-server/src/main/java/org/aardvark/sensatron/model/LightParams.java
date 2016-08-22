@@ -16,6 +16,7 @@ public class LightParams implements Cloneable {
 	private int saturation = 100;
 	private int slider4;
 	private int[] pitchSliders = new int[12];
+	private boolean virtualBeat;
 
 	public boolean isOn() {
 		return on;
@@ -91,5 +92,13 @@ public class LightParams implements Cloneable {
 
 	public void setFlashlight(boolean flashlight) {
 		this.flashlight = flashlight;
+	}
+
+	public boolean isVirtualBeat() {
+		return virtualBeat;
+	}
+
+	public void setVirtualBeat(boolean virtualBeat) {
+		this.virtualBeat = virtualBeat;
 	}
 }
