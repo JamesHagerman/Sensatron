@@ -71,6 +71,8 @@ public class LightsController implements Runnable {
 	float goodFFTLog[] = new float[STRAND_LENGTH];
 	int fftPeaks[] = new int[1]; // redefined in setup()
 	int fftLogPeaks[] = new int[1]; // redefined in setup()
+	float currentPeak = 0.0f;
+	float currentAverage = 0.0f;
 
 	// NETWORK TO LIGHTS:
 	Socket socket = null;
@@ -91,7 +93,7 @@ public class LightsController implements Runnable {
 
 	int envMax = 255;
 	int env1Value = 0;
-	int env1Rate = 1;
+	int env1Rate = 4;
 	int env2Value = 0;
 	int env2Rate = 10;
 	public void trig1() {
@@ -130,8 +132,8 @@ public class LightsController implements Runnable {
 	// AR Envelope
 	int arValue = 0;
 	int arState = -1; //-1 = settled, 0=A, 1=R
-	int aRate = 1;
-	int rRate = 10;
+	int aRate = 10;
+	int rRate = 5;
 	public void trigAR() {
 		log.info("arTriggered!");
 		arState = 0; // attack mode
@@ -339,6 +341,14 @@ public class LightsController implements Runnable {
                 .mapToInt(ele -> ele).toArray();
 		// log.info("FFT SORTED: " + Arrays.toString(fftPeaks));
 
+		// Calculate the current peak and the current total average:
+		currentPeak = goodFFTBuckets[fftPeaks[0]];
+		float sum = 0.0f;
+		for (float d : goodFFTBuckets) {
+			sum = sum + d;
+		}
+		currentAverage = 1.0f * sum / goodFFTBuckets.length;
+
 
 	  ledCount = 0; // Reset ledCount
 	  // since logarithmically spaced averages are not equally spaced
@@ -372,9 +382,10 @@ public class LightsController implements Runnable {
 			return;
 		}
 
+		float saturation = p.getSaturation() / 100f;
+
 		switch (p.getMode()) {
 			case LightParams.MODE_SPECTRUM:
-				float saturation = p.getSaturation() / 100f;
 				int start = p.getHue1();
 				int step = (p.getHue2() - start) / STRAND_LENGTH;
 				for (int strand = 0; strand < STRANDS; strand++) {
@@ -385,24 +396,60 @@ public class LightsController implements Runnable {
 				}
 				return;
 			case LightParams.MODE_BLOBS:
-				updateBlobs();
+				int pickedColor = Color.HSBtoRGB(p.getHue1()/255.0f, saturation, 1.0f);
+
+				shiftAllOut();
+
+				for(int i = 0; i < STRANDS; i++) {
+					int roundedVal = Math.round(goodFFTBuckets[i])*10;
+					// int roundedVal = Math.round(goodFFTLog[i]);
+
+				  int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
+					int blended = blend(theColor, pickedColor, (env1Value+env2Value+arValue)/255.0f);
+					setOneLight(i, 0, blended);
+				}
+
+				// debug
+				// int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
+				// setOneRing(currentLED, theColor);
 				return;
 			case LightParams.MODE_FFT:
-				int shiftedTime = (int)(globalTime*10.0f)%255;
+				// int shiftedTime = (int)(globalTime*10.0f)%255;
 
-				int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
-				int currentLED = (int)((p.getHue2()/255.0f)*STRAND_LENGTH);
+				// int currentStrand = (int)((p.getHue1()/255.0f)*STRANDS);
+				// int currentLED = (int)((p.getHue2()/255.0f)*STRAND_LENGTH);
 				// log.info("Shifted time: " + shiftedTime);
 				// log.info("current strand: " + currentStrand);
 
-				for(int i = 0; i < STRAND_LENGTH; i++) {
-					int roundedVal = Math.round(goodFFTBuckets[i])*10;
-					// int roundedVal = Math.round(goodFFTLog[i])*10;
+				shiftAllOut();
 
-				  int theColor = Color.HSBtoRGB(roundedVal/255.0f, 1.0f, 1.0f);
-					setOneRing(i, theColor);
-					// setOneSpiral(0, i, 1, theColor);
-					// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
+				// whitenAll(p.getHue1);
+
+				float amount = p.getHue2()/255.0f;
+				int toMix = Color.HSBtoRGB(p.getHue1(), saturation, 1.0f);
+
+				// mix(amount, toMix);
+
+				int cutPoint = (int) (((env1Value+env2Value+arValue)/255.0f)*STRAND_LENGTH); // 0-STRAND_LENGTH
+				cutPoint = STRAND_LENGTH - cutPoint;
+				// log.info("Cut point: "+ cutPoint);
+				for(int i = 0; i < cutPoint; i++) {
+
+					// Only care about spikes above the average
+					// float roundedVal = 0;
+					// if (goodFFTBuckets[i] > currentAverage+(currentAverage*0.1)) {
+						// roundedVal = goodFFTBuckets[i];
+						// roundedVal = Math.round(goodFFTLog[i]);
+						int theColor = Color.HSBtoRGB(goodFFTBuckets[i]/currentPeak, saturation, 1.0f);
+						setOneRing(i, theColor);
+
+						// setOneSpiral(0, i, 1, theColor);
+						// setOneLight(currentStrand, i, Color.HSBtoRGB(shiftedTime/255.0f, 1.0f, 1.0f) );
+					// }
+
+
+
+
 				}
 
 				// debug
@@ -427,6 +474,8 @@ public class LightsController implements Runnable {
 	}
 	// end helpers
 	//============
+
+	// LED DRAWING TOOLS:
 	void setOneLight(int strand, int lightNum, int c) {
 	  strand = strand%STRANDS;
 	  lightNum = lightNum%STRAND_LENGTH;
@@ -455,7 +504,106 @@ public class LightsController implements Runnable {
 	    setOneLight(strand + i, lightOffset, c);
 	  }
 	}
+	// These affect the pixels
+	void shiftAllOut() {
+		int lightIndex = 0;
+		for (int strand = STRANDS-1; strand >= 0; strand--) {
+	    for (int lightNum = STRAND_LENGTH-1; lightNum >= 1; lightNum--) {
+	      lights[strand][lightNum] = lights[strand][lightNum-1];
+	      lightIndex++;
+	    }
+	  }
+	}
 
+ 	int blend( int i1, int i2, float ratio ) {
+		int toReturn = 0;
+    if ( ratio > 1f ) ratio = 1f;
+    else if ( ratio < 0f ) ratio = 0f;
+    float iRatio = 1.0f - ratio;
+
+    int r1 = ((i1 & 0xff0000) >> 16);
+    int g1 = ((i1 & 0xff00) >> 8);
+    int b1 = (i1 & 0xff);
+
+    int r2 = ((i2 & 0xff0000) >> 16);
+    int g2 = ((i2 & 0xff00) >> 8);
+    int b2 = (i2 & 0xff);
+
+    int r = (int)((r1 * iRatio) + (r2 * ratio));
+    int g = (int)((g1 * iRatio) + (g2 * ratio));
+    int b = (int)((b1 * iRatio) + (b2 * ratio));
+		toReturn =  r << 16 | g << 8 | b ;
+
+    return toReturn;
+	}
+
+	void whitenAll(int amount) {
+		int lightIndex = 0;
+		for (int strand = 0; strand < STRANDS; strand++) {
+	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+				int currentValue = lights[strand][lightNum];
+
+				// unpack to bytes
+				int r = (currentValue >> 16) & 0xff;
+				int g = (currentValue >> 8) & 0xff;
+				int b = (currentValue) & 0xff;
+
+				// Do some processing:
+				r = r + amount;
+				g = g + amount;
+				b = b + amount;
+
+				// limit
+				if (r > 255) r = 255;
+				if (g > 255) g = 255;
+				if (b > 255) b = 255;
+
+				// pack
+				currentValue = color(r, g, b);
+
+	      lights[strand][lightNum] = currentValue;
+	      lightIndex++;
+	    }
+	  }
+	}
+
+	void mix(float amount, int baseColor) {
+		int lightIndex = 0;
+		for (int strand = 0; strand < STRANDS; strand++) {
+	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+				int currentValue = lights[strand][lightNum];
+
+				// unpack to bytes
+				int r = (currentValue >> 16) & 0xff;
+				int g = (currentValue >> 8) & 0xff;
+				int b = (currentValue) & 0xff;
+
+				int rBase = (baseColor >> 16) & 0xff;
+				int gBase = (baseColor >> 8) & 0xff;
+				int bBase = (baseColor) & 0xff;
+
+				// Do some processing:
+				r = r * (int)(rBase * amount);
+				g = g * (int)(gBase * amount);
+				b = b * (int)(bBase * amount);
+
+				// limit
+				if (r > 255) r = 255;
+				if (g > 255) g = 255;
+				if (b > 255) b = 255;
+
+				// pack
+				currentValue = color(r, g, b);
+
+	      lights[strand][lightNum] = currentValue;
+	      lightIndex++;
+	    }
+	  }
+	}
+
+	// END LED DRAWING TOOLS
+
+	// TCL Stuff
 	public void buildRemapArray() {
 	  log.debug("Building remap array...");
 	  // Linear mapping - No fold back:
