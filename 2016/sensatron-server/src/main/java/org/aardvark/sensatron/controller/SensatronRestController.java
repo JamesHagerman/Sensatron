@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 import org.aardvark.sensatron.lights.LightsController;
+import org.aardvark.sensatron.model.FluidSimRequest;
 import org.aardvark.sensatron.model.LightParams;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,20 +136,31 @@ public class SensatronRestController {
 
 	@RequestMapping(value = "/lightData", method = RequestMethod.PUT)
 	public String putLightData(@RequestBody String request) {
+		FluidSimRequest req = new Gson().fromJson(request, FluidSimRequest.class);
+		int numStrands = req.getNumLightProbeRadials();
+		int numLights = req.getNumLightProbeLightsPerRadial();
+		if (numStrands > lightsController.getNumStrands()) {
+			logger.warn("Light array configuration does not match; FluidSim expects " + numStrands + " strands");
+			numStrands = lightsController.getNumStrands();
+		}
+		if (numLights > lightsController.getStrandLength()) {
+			logger.warn("Light array configuration does not match; FluidSim expects " + numLights + " lights");
+			numLights = lightsController.getStrandLength();
+		}
 		LightParams p = lightsController.getParams();
 		p.setDirectInput(true);
 		lightsController.setParams(p);
 		int strand = 0;
 		int light = 0;
-		byte[] decoded = Base64.getDecoder().decode(request);
+		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData());
 		for (int i = 0; i < decoded.length - 2; i += 3) {
 			lightsController.setOneLight(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
 			light++;
-			if (light > lightsController.getStrandLength()) {
+			if (light > numLights) {
 				light = 0;
 				strand++;
 			}
-			if (strand > lightsController.getNumStrands()) {
+			if (strand > numStrands) {
 				logger.warn("Color data longer than expected: " + decoded.length);
 				break;
 			}
