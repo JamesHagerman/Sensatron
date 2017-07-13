@@ -305,7 +305,9 @@ public class LightsController implements Runnable {
 		// derp = !derp;
 
 
-		doArt(p);
+		if (!params.isDirectInput()) {
+			doArt(p);
+		}
 
 		// REQUIRED CODE:
 		mapDrawingToLights(); // lights[][] -> pixel[]
@@ -472,7 +474,7 @@ public class LightsController implements Runnable {
 	//============
 
 	// LED DRAWING TOOLS:
-	void setOneLight(int strand, int lightNum, int c) {
+	public void setOneLight(int strand, int lightNum, int c) {
 	  strand = strand%STRANDS;
 	  lightNum = lightNum%STRAND_LENGTH;
 	  lights[strand][lightNum] = c;
@@ -733,4 +735,11 @@ public class LightsController implements Runnable {
 		this.mediaPath = mediaPath;
 	}
 
+	public int getNumStrands() {
+		return STRANDS;
+	}
+	
+	public int getStrandLength() {
+		return STRAND_LENGTH;
+	}
 }

@@ -1,6 +1,7 @@
 package org.aardvark.sensatron.controller;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import org.aardvark.sensatron.lights.LightsController;
 import org.aardvark.sensatron.model.LightParams;
@@ -132,6 +133,29 @@ public class SensatronRestController {
 		// return response;
 	}
 
+	@RequestMapping(value = "/lightData", method = RequestMethod.PUT)
+	public String putLightData(@RequestBody String request) {
+		LightParams p = lightsController.getParams();
+		p.setDirectInput(true);
+		lightsController.setParams(p);
+		int strand = 0;
+		int light = 0;
+		byte[] decoded = Base64.getDecoder().decode(request);
+		for (int i = 0; i < decoded.length - 2; i += 3) {
+			lightsController.setOneLight(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
+			light++;
+			if (light > lightsController.getStrandLength()) {
+				light = 0;
+				strand++;
+			}
+			if (strand > lightsController.getNumStrands()) {
+				logger.warn("Color data longer than expected: " + decoded.length);
+				break;
+			}
+		}
+		return "{ response: 'Sensatron ok!'}";
+	}
+	
 	@RequestMapping(value = "/lights", method = RequestMethod.DELETE)
 	public void deleteSomething(@RequestBody String request,@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
 
