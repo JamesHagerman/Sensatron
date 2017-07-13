@@ -63,6 +63,7 @@ public class LightsController implements Runnable {
 	/* Could also use PImage and loadPixels()/updatePixels()...many options! */
 
 	int[][] lights = new int[STRANDS][STRAND_LENGTH];
+	int[][] directInput = new int[STRANDS][STRAND_LENGTH];
 	int SPACING = 5;
 
 	// ANIMATION REQUIRED:
@@ -305,12 +306,16 @@ public class LightsController implements Runnable {
 		// derp = !derp;
 
 
-		if (!params.isDirectInput()) {
-			doArt(p);
+		doArt(p);
+		
+		if (!p.isOn()) {
+			setAllLights(0);
+		} else if (p.isFlashlight()) {
+			setAllLights(0xffffff);
 		}
-
+		
 		// REQUIRED CODE:
-		mapDrawingToLights(); // lights[][] -> pixel[]
+		mapDrawingToLights(p); // lights[][] -> pixel[]
 		drawLEDs(); // draws pixel[] to the LEDs.
 		// YUP.
 	}
@@ -386,15 +391,6 @@ public class LightsController implements Runnable {
 	void doArt(LightParams p) {
 		// log.info("LightsController thinks: " + p);
 
-		if (!p.isOn()) {
-			setAllLights(0);
-			return;
-		}
-		if (p.isFlashlight()) {
-			setAllLights(0xffffff);
-			return;
-		}
-
 		float saturation = p.getSaturation() / 100f;
 		float rotate = p.getHue2()/255.0f;
 		float rate = p.getSlider4()/100.0f;
@@ -457,6 +453,12 @@ public class LightsController implements Runnable {
 				return;
 		}
 	}
+	
+	public void setDirectInput(int strand, int lightNum, int c) {
+		  strand = strand%STRANDS;
+		  lightNum = lightNum%STRAND_LENGTH;
+		  directInput[strand][lightNum] = c;
+		}
 	
 	//=============
 	// HELPERS:
@@ -607,16 +609,28 @@ public class LightsController implements Runnable {
 
 	  log.debug("Done building remap array.");
 	}
-		// Move colors from lights[][] to pixel[] structure
-	void mapDrawingToLights() {
+	
+	// Move colors from lights[][] to pixel[] structure
+	void mapDrawingToLights(LightParams p) {
 	  int lightIndex = 0;
 	  for (int strand = 0; strand < STRANDS; strand++) {
 	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
-	      pixels[lightIndex] = lights[strand][lightNum];
+	      pixels[lightIndex] = blend(lights[strand][lightNum], directInput[strand][lightNum], p);
 	      lightIndex++;
 	    }
 	  }
 	}
+	
+	// Handle blending between art and direct input
+	int blend(int color1, int color2, LightParams p) {
+		// TODO: blend modes
+		if (p.isDirectInput()) {
+			return color2;
+		} else {
+			return color1;
+		}
+	}
+	
 	// Draw color from pixel[] structure to the LEDs themselves:
 	void drawLEDs() {
 		if (tcl) {

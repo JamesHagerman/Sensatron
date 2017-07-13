@@ -154,7 +154,7 @@ public class SensatronRestController {
 		int light = 0;
 		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData());
 		for (int i = 0; i < decoded.length - 2; i += 3) {
-			lightsController.setOneLight(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
+			lightsController.setDirectInput(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
 			light++;
 			if (light > numLights) {
 				light = 0;
