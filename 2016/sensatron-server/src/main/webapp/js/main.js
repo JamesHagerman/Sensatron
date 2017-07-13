@@ -30,11 +30,16 @@ function flashlight() {
 	updateLights({flashlight: true});
 }
 
+function directInput() {
+	updateLights({directInput: true});
+}
+
 function lightParamsCallback(settingsJSON) {
 	var settings = JSON.parse(settingsJSON);
 	allowUpdate = false;
 	$('#lightsOn').text(settings.on ? 'on' : 'off');
 	$('#flashlightOn').text(settings.flashlight ? 'on' : 'off');
+	$('#directInputOn').text(settings.directInput ? 'on' : 'off');
 	$('#hue1').val(settings.hue1).change();
 	$('#hue2').val(settings.hue2).change();
 	$('#saturation').val(settings.saturation).change();

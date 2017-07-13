@@ -37,6 +37,7 @@ public class SensatronRestController {
 	@RequestMapping(value = "/lights", method = RequestMethod.POST)
 	public String setLightParams(@RequestParam(value = "toggle", required = false) Boolean toggle,
 								@RequestParam(value = "flashlight", required = false) Boolean flashlight,
+								@RequestParam(value = "directInput", required = false) Boolean directInput,
 								@RequestParam(value = "beat", required = false) Boolean beat,
 								@RequestParam(value = "mode", required = false) Integer mode,
 								@RequestParam(value = "saturation", required = false) Integer saturation,
@@ -56,6 +57,13 @@ public class SensatronRestController {
 				lightParams.setFlashlight(false);
 			} else {
 				lightParams.setFlashlight(true);
+			}
+		}
+		if (directInput != null && directInput) {
+			if (lightParams.isDirectInput()) {
+				lightParams.setDirectInput(false);
+			} else {
+				lightParams.setDirectInput(true);
 			}
 		}
 		if (hue1 != null) {
@@ -147,9 +155,6 @@ public class SensatronRestController {
 			logger.warn("Light array configuration does not match; FluidSim expects " + numLights + " lights");
 			numLights = lightsController.getStrandLength();
 		}
-		LightParams p = lightsController.getParams();
-		p.setDirectInput(true);
-		lightsController.setParams(p);
 		int strand = 0;
 		int light = 0;
 		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData().trim());
