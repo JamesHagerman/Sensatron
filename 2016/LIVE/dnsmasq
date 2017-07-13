@@ -2,4 +2,4 @@
 
 dnsmasq=/usr/sbin/dnsmasq.original
 
-exec $dnsmasq --addn-hosts=/etc/dnsmasq.hosts --no-hosts --log-queries `echo $@`
+exec $dnsmasq --address=/#/10.42.0.1 --addn-hosts=/etc/dnsmasq.hosts --no-hosts --log-queries `echo $@`
