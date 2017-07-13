@@ -152,7 +152,7 @@ public class SensatronRestController {
 		lightsController.setParams(p);
 		int strand = 0;
 		int light = 0;
-		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData());
+		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData().trim());
 		for (int i = 0; i < decoded.length - 2; i += 3) {
 			lightsController.setDirectInput(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
 			light++;
