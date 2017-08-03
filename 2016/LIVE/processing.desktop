@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=2.1
+Name=Processing
+Comment=Processing Rocks
+Exec=processing
+Icon=/opt/processing/lib/icons/pde-256.png
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;Graphics;
