@@ -1,0 +1,17 @@
+[Unit]
+Description="Job that runs the sensatron server..."
+After=network.target
+
+[Service]
+Type=forking
+#Environment=statedir=/var/cache/foo
+#ExecStartPre=/usr/bin/makedir -p ${statedir}
+ExecStart=/home/sensatron/bin/start-server.sh
+
+User=sensatron
+Group=sensatron
+#User=root
+#Group=root
+
+[Install]
+WantedBy=multi-user.target
