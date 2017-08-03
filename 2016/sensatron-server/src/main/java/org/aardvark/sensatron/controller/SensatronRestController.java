@@ -161,7 +161,7 @@ public class SensatronRestController {
 			logger.warn("Light array configuration does not match; FluidSim expects " + numLights + " lights");
 			numLights = lightsController.getStrandLength();
 		}
-		int strand = 0;
+		int strand = numStrands - 1;
 		int light = 0;
 		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData().trim());
 		// logger.debug("data length: " + decoded.length + " pixel count: " + decoded.length/3 + " num lights: " + numLights + " num strands: " + numStrands);
@@ -170,9 +170,9 @@ public class SensatronRestController {
 			light++;
 			if (light >= numLights) {
 				light = 0;
-				strand++;
+				strand--;
 			}
-			if (strand > numStrands) {
+			if (strand < 0) {
 				logger.warn("Color data longer than expected: " + decoded.length);
 				break;
 			}

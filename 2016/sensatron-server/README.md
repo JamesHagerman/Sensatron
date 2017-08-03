@@ -94,3 +94,70 @@ mvn jetty:run
 ```
 
 Then go to `http://localhost:8080` in your browser to see the control site!
+
+
+## System services:
+
+We have written a systemd/systemctl service that starts up on boot. It lives here:
+
+`/etc/systemd/system/sensatron.service`
+
+When that service starts up, it runs `start-server.sh` which actually configures the correct environment variables and ends up running:
+
+`mvn jetty:run >> ~sensatron/run.log &`
+
+Other than that, we run `hostapd`, `dnsmasq`, and `nginx`:
+
+- `hostapd` to set up an access point named `Sensatron` at `10.42.0.1`
+- `dnsmasq` to route all DNS requests to the Nuc (once clients are connected)
+- `nginx` to host a proxy that points at the Maven server, `sensatron-server`
+
+
+## Controlling the sensatron.service
+
+The service starts on boot. If you stop it, starting the service with the following DOES NOT SEEM TO WORK!!!:
+
+```
+sudo systemctl start sensatron.service
+```
+
+So use:
+
+```
+~sensatron/dev/Sensatron/2016/LIVE/start-server.sh
+```
+
+
+Stop the service with:
+
+```
+sudo systemctl stop sensatron.service
+```
+
+## Getting back into the Nuc to work on the projcet
+
+After hooking up a screen and keyboard to the Nuc, you'll end up at a desktop.
+
+### To use the on screen color display
+
+0. Unplug the USB cable that goes to the lights/lasagna pan, whatever
+1. Stop the service
+2. Start processing (and close the nagging Welcome screen)
+3. Load the `LEDDisplay` Processing script from: `~/dev/Sensatron/2016/LEDDisplay`
+4. Run `LEDDisplay`
+5. Start 
+6. `tail -f ~sensatron/run.log`
+
+
+### See if the server is actually still running
+
+`ps -axww | grep sensatron`
+
+### Kill an unruly server
+
+This will kill processing as well...
+
+`killall java`
+
+
+
