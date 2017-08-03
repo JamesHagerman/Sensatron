@@ -75,7 +75,7 @@ public class LightsController implements Runnable {
 	int fftLogPeaks[] = new int[1]; // redefined in setup()
 	float currentPeak = 0.0f;
 	float currentAverage = 0.0f;
-	
+
 	LightDisplay spectrumDisplay;
 
 	// NETWORK TO LIGHTS:
@@ -227,7 +227,7 @@ public class LightsController implements Runnable {
 		} catch(Exception e) {
 			log.error("Couldn't open audio? " + e);
 		}
-		
+
 		spectrumDisplay = new SpectrumDisplay(beat);
 
 		try {
@@ -274,7 +274,7 @@ public class LightsController implements Runnable {
 			LightParams p = getParams();
 			// Reset the virtual beat detector right away, so we don't miss anything
 			params.setVirtualBeat(false);
-			
+
 			draw(p);
 
 			try {
@@ -307,13 +307,13 @@ public class LightsController implements Runnable {
 
 
 		doArt(p);
-		
+
 		if (!p.isOn()) {
 			setAllLights(0);
 		} else if (p.isFlashlight()) {
 			setAllLights(0xffffff);
 		}
-		
+
 		// REQUIRED CODE:
 		mapDrawingToLights(p); // lights[][] -> pixel[]
 		drawLEDs(); // draws pixel[] to the LEDs.
@@ -453,13 +453,13 @@ public class LightsController implements Runnable {
 				return;
 		}
 	}
-	
+
 	public void setDirectInput(int strand, int lightNum, int c) {
 		  strand = strand%STRANDS;
 		  lightNum = lightNum%STRAND_LENGTH;
 		  directInput[strand][lightNum] = c;
 		}
-	
+
 	//=============
 	// HELPERS:
 	// Random color generator:
@@ -609,7 +609,7 @@ public class LightsController implements Runnable {
 
 	  log.debug("Done building remap array.");
 	}
-	
+
 	// Move colors from lights[][] to pixel[] structure
 	void mapDrawingToLights(LightParams p) {
 	  int lightIndex = 0;
@@ -620,17 +620,22 @@ public class LightsController implements Runnable {
 	    }
 	  }
 	}
-	
+
 	// Handle blending between art and direct input
 	int blend(int color1, int color2, LightParams p) {
 		// TODO: blend modes
+		float blendAmount = p.getSlider5()/100.0f;
+		// log.debug("Blend (slider5) set to: " + blendAmount);
+
+		
+
 		if (p.isDirectInput()) {
 			return color2;
 		} else {
 			return color1;
 		}
 	}
-	
+
 	// Draw color from pixel[] structure to the LEDs themselves:
 	void drawLEDs() {
 		if (tcl) {
@@ -752,7 +757,7 @@ public class LightsController implements Runnable {
 	public int getNumStrands() {
 		return STRANDS;
 	}
-	
+
 	public int getStrandLength() {
 		return STRAND_LENGTH;
 	}

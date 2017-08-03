@@ -42,6 +42,7 @@ public class SensatronRestController {
 								@RequestParam(value = "mode", required = false) Integer mode,
 								@RequestParam(value = "saturation", required = false) Integer saturation,
 								@RequestParam(value = "slider4", required = false) Integer slider4,
+								@RequestParam(value = "slider5", required = false) Integer slider5,
 								@RequestParam(value = "hue1", required = false) Integer hue1,
 								@RequestParam(value = "hue2", required = false) Integer hue2) {
 		LightParams lightParams = lightsController.getParams();
@@ -78,6 +79,9 @@ public class SensatronRestController {
 		if (slider4 != null) {
 			lightParams.setSlider4(slider4);
 		}
+		if (slider5 != null) {
+			lightParams.setSlider5(slider5);
+		}
 		if (mode != null) {
 			lightParams.setMode(mode);
 		}
@@ -104,7 +108,7 @@ public class SensatronRestController {
 		}
 		return "";
 	}
-	
+
 	@RequestMapping(value = "/lights", method = RequestMethod.PUT)
 	public String putSomething(@RequestBody String request, @RequestParam(value = "version", required = false, defaultValue = "1") int version) {
 
@@ -144,6 +148,8 @@ public class SensatronRestController {
 
 	@RequestMapping(value = "/lightData", method = RequestMethod.PUT)
 	public String putLightData(@RequestBody String request) {
+		// logger.debug("Start lightData");
+		// logger.debug("data: '" + request +"'");
 		FluidSimRequest req = new Gson().fromJson(request, FluidSimRequest.class);
 		int numStrands = req.getNumLightProbeRadials();
 		int numLights = req.getNumLightProbeLightsPerRadial();
@@ -158,10 +164,11 @@ public class SensatronRestController {
 		int strand = 0;
 		int light = 0;
 		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData().trim());
+		// logger.debug("data length: " + decoded.length + " pixel count: " + decoded.length/3 + " num lights: " + numLights + " num strands: " + numStrands);
 		for (int i = 0; i < decoded.length - 2; i += 3) {
 			lightsController.setDirectInput(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
 			light++;
-			if (light > numLights) {
+			if (light >= numLights) {
 				light = 0;
 				strand++;
 			}
@@ -172,7 +179,7 @@ public class SensatronRestController {
 		}
 		return "{ response: 'Sensatron ok!'}";
 	}
-	
+
 	@RequestMapping(value = "/lights", method = RequestMethod.DELETE)
 	public void deleteSomething(@RequestBody String request,@RequestParam(value = "version", required = false, defaultValue = "1") int version) {
 

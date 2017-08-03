@@ -15,6 +15,7 @@ public class LightParams implements Cloneable {
 	private int hue2 = 255;
 	private int saturation = 100;
 	private int slider4 = 10;
+	private int slider5 = 10;
 	private int[] pitchSliders = new int[12];
 	private boolean virtualBeat;
 	private boolean directInput;
@@ -30,7 +31,7 @@ public class LightParams implements Cloneable {
 	@Override
 	public String toString() {
 		return "LightParams [on=" + on + ", flashlight=" + flashlight + ", mode=" + mode + ", hue1=" + hue1 + ", hue2="
-				+ hue2 + ", saturation=" + saturation + ", slider4=" + slider4 + ", pitchSliders="
+				+ hue2 + ", saturation=" + saturation + ", slider4=" + slider4 + ", slider5=" + slider5 + ", pitchSliders="
 				+ Arrays.toString(pitchSliders) + "]";
 	}
 
@@ -77,6 +78,15 @@ public class LightParams implements Cloneable {
 
 	public void setSlider4(int slider4) {
 		this.slider4 = slider4;
+	}
+
+	// Slider 5 is for fade between liquidsim and server animation
+	public int getSlider5() {
+		return slider5;
+	}
+
+	public void setSlider5(int slider5) {
+		this.slider5 = slider5;
 	}
 
 	public int[] getPitchSliders() {

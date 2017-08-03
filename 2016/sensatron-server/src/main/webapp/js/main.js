@@ -8,6 +8,7 @@ var theParams = {
    'hue2': 3,
    'saturation': 6,
    'slider4': 5,
+   'slider5': 5,
    'pitchSliders': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 };
 allowUpdate = true;
@@ -44,6 +45,7 @@ function lightParamsCallback(settingsJSON) {
 	$('#hue2').val(settings.hue2).change();
 	$('#saturation').val(settings.saturation).change();
 	$('#slider4').val(settings.slider4).change();
+  $('#slider5').val(settings.slider5).change();
 	setModeButtonOn(settings.mode);
 	allowUpdate = true;
 }
@@ -64,7 +66,7 @@ function setModeButtonOn(mode) {
     	updateLights(params)
     }
   }
-  
+
 function setSliderValue(event) {
 	if (allowUpdate) {
   	  	var sliderId = $(this).prop('id');
@@ -102,6 +104,7 @@ $(document).ready(function() {
   $('.hue-slider').change(setHue);
   $('#saturation').change(setSliderValue);
   $('#slider4').change(setSliderValue);
+  $('#slider5').change(setSliderValue);
   $('.mode-button').click(setMode);
   $('.trigger-button').on("vmousedown", pressTrigger);
   $('#beat').on("vmousedown", function() { updateLights({beat: true}); });

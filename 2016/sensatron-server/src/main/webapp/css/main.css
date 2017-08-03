@@ -46,7 +46,13 @@ div.ui-slider {
   	top: .15em;
   	margin-left: -1.5em;
   }
-  
+	#slider5 ~ .ui-slider-track .ui-slider-handle {
+  	width: 2.5em;
+  	height: 2.5em;
+  	top: .15em;
+  	margin-left: -1.5em;
+  }
+
   .hue-slider ~ .ui-slider-track {
   	background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
   }
@@ -71,6 +77,18 @@ div.ui-slider {
   }
   #slider4 ~ .ui-slider-track .ui-slider-handle {
   	border-color: #ffffff;
+    background: transparent;
+    border-width: .5em;
+    width: 1.6em;
+    height: 1.6em;
+  }
+	#slider5 ~ .ui-slider-track {
+  	background: black url("../assets/slider_variance.svg") no-repeat;
+  	background-size: 100% 100%;
+  	border: none;
+  }
+  #slider5 ~ .ui-slider-track .ui-slider-handle {
+  	border-color: #ff0000;
     background: transparent;
     border-width: .5em;
     width: 1.6em;
