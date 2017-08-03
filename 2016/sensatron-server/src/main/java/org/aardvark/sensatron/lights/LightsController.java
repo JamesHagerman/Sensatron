@@ -624,16 +624,46 @@ public class LightsController implements Runnable {
 	// Handle blending between art and direct input
 	int blend(int color1, int color2, LightParams p) {
 		// TODO: blend modes
-		float blendAmount = p.getSlider5()/100.0f;
-		// log.debug("Blend (slider5) set to: " + blendAmount);
 
-		
+		// Blend ratio:
+		float ratio = p.getSlider5()/100.0f;
+		// log.debug("Blend (slider5) set to: " + ratio);
 
-		if (p.isDirectInput()) {
-			return color2;
-		} else {
-			return color1;
+		if ( ratio > 1.0f ) {
+			ratio = 1.0f;
 		}
+    else if ( ratio < 0.0f ) {
+			ratio = 0.0f;
+		}
+
+    float iRatio = 1.0f - ratio;
+
+    int r1 = ((color1 & 0xff0000) >> 16);
+    int g1 = ((color1 & 0xff00) >> 8);
+    int b1 = (color1 & 0xff);
+
+    int r2 = ((color2 & 0xff0000) >> 16);
+    int g2 = ((color2 & 0xff00) >> 8);
+    int b2 = (color2 & 0xff);
+
+		// X-Fade
+    int r = (int)((r1 * iRatio) + (r2 * ratio));
+    int g = (int)((g1 * iRatio) + (g2 * ratio));
+    int b = (int)((b1 * iRatio) + (b2 * ratio));
+
+		// Screen blend (results in brighter picture)
+		int r = (int)((r1 * iRatio) + (r2 * ratio));
+    int g = (int)((g1 * iRatio) + (g2 * ratio));
+    int b = (int)((b1 * iRatio) + (b2 * ratio));
+
+    return (r << 16 | g << 8 | b );
+
+
+		// if (p.isDirectInput()) {
+		// 	return color2; // color2 = Colors from sim
+		// } else {
+		// 	return color1; // color1 = Colors from server
+		// }
 	}
 
 	// Draw color from pixel[] structure to the LEDs themselves:
