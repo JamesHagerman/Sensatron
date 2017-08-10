@@ -172,7 +172,7 @@ public class SensatronRestController {
 				light = 0;
 				strand--;
 			}
-			if (strand > numStrands) {
+			if (strand < 0) { // strand starts at numStrands-1 and counts down
 				logger.warn("Color data longer than expected: " + decoded.length);
 				break;
 			}
