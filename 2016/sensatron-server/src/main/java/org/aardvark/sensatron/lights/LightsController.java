@@ -25,6 +25,10 @@ import java.io.IOException;
 
 
 public class LightsController implements Runnable {
+	
+	public static final int RED   = 0xff0000;
+	public static final int GREEN = 0x00ff00;
+	public static final int BLUE  = 0x0000ff;
 
 	private final Thread renderThread = new Thread(this);
 	public Minim minim;
@@ -623,75 +627,57 @@ public class LightsController implements Runnable {
 
 	// Handle blending between art and direct input
 	int blend(int color1, int color2, LightParams p) {
-		// TODO: blend modes
+		int result = color1;
+		switch (p.getBlendMode()) {
+		case LightParams.BLEND_MODE_1:
+			// X-Fade
+			result = blend(color1, color2, p.getSlider5()/100.0f);
+			break;
+		case LightParams.BLEND_MODE_2:
+			int threshold = p.getSlider5();
+			if ((color2 & RED) < threshold && (color2 & GREEN) < threshold && (color2 & BLUE) < threshold) {
+				result = (int) (color1 * (threshold/255.0));
+			}
+			break;
+		case LightParams.BLEND_MODE_3:
+			break;
+		case LightParams.BLEND_MODE_4:
+			// Hacked Screen blend (results in brighter picture. annnnnd pastel land)
+			// int r = (int)( ~((~r1 & 0xff)*(~r2 & 0xff)) & 0xff );
+	    // int g = (int)( ~((~g1 & 0xff)*(~g2 & 0xff)) & 0xff );
+	    // int b = (int)( ~((~b1 & 0xff)*(~b2 & 0xff)) & 0xff );
 
-		// Blend ratio:
-		float ratio = p.getSlider5()/100.0f;
-		// log.debug("Blend (slider5) set to: " + ratio);
+			// If Nuc is entirely white and there are splotches of blue coming from tablet
+			// we really want to SUBTRACT the INVERTED TABLET colors from the White of the NUC
+			// r1 - (~r2 & 0xff)
 
-		if ( ratio > 1.0f ) {
-			ratio = 1.0f;
+			// If Nuc is entirely Black for some reason,
+			// We really want to ADD the NON-INVERTED tablet colors TO the black of the NUC
+			// r1 + r2
+
+			// float[] hsb1 = Color.RGBtoHSB(r1, g1, b1, null);
+			// float[] hsb2 = Color.RGBtoHSB(r2, g2, b2, null);
+			//
+			// if (hsb1[2]>hsb2[2]) {
+			// 	return color1;
+			// } else {
+			// 	return color2;
+			// }
+
+			// int mod1 = Color.HSBtoRGB(hsb1[0], hsb1[1], hsb1[2]);
+			// int mod2 = Color.HSBtoRGB(hsb2[0], hsb2[1], hsb2[2]);
+
+
+
+			// if (r2>r1 || g2>g1 || b2>b1) {
+			// 	return color2;
+			// } else {
+			// 	return color1;
+			// }
+			break;
 		}
-    else if ( ratio < 0.0f ) {
-			ratio = 0.0f;
-		}
+		return result;
 
-    float iRatio = 1.0f - ratio;
-
-    int r1 = ((color1 & 0xff0000) >> 16);
-    int g1 = ((color1 & 0xff00) >> 8);
-    int b1 = (color1 & 0xff);
-
-    int r2 = ((color2 & 0xff0000) >> 16);
-    int g2 = ((color2 & 0xff00) >> 8);
-    int b2 = (color2 & 0xff);
-
-		// X-Fade
-    int r = (int)((r1 * iRatio) + (r2 * ratio));
-    int g = (int)((g1 * iRatio) + (g2 * ratio));
-    int b = (int)((b1 * iRatio) + (b2 * ratio));
-
-		// Hacked Screen blend (results in brighter picture. annnnnd pastel land)
-		// int r = (int)( ~((~r1 & 0xff)*(~r2 & 0xff)) & 0xff );
-    // int g = (int)( ~((~g1 & 0xff)*(~g2 & 0xff)) & 0xff );
-    // int b = (int)( ~((~b1 & 0xff)*(~b2 & 0xff)) & 0xff );
-
-		// If Nuc is entirely white and there are splotches of blue coming from tablet
-		// we really want to SUBTRACT the INVERTED TABLET colors from the White of the NUC
-		// r1 - (~r2 & 0xff)
-
-		// If Nuc is entirely Black for some reason,
-		// We really want to ADD the NON-INVERTED tablet colors TO the black of the NUC
-		// r1 + r2
-
-		// float[] hsb1 = Color.RGBtoHSB(r1, g1, b1, null);
-		// float[] hsb2 = Color.RGBtoHSB(r2, g2, b2, null);
-		//
-		// if (hsb1[2]>hsb2[2]) {
-		// 	return color1;
-		// } else {
-		// 	return color2;
-		// }
-
-		// int mod1 = Color.HSBtoRGB(hsb1[0], hsb1[1], hsb1[2]);
-		// int mod2 = Color.HSBtoRGB(hsb2[0], hsb2[1], hsb2[2]);
-
-
-
-		// if (r2>r1 || g2>g1 || b2>b1) {
-		// 	return color2;
-		// } else {
-		// 	return color1;
-		// }
-
-    return (r << 16 | g << 8 | b );
-
-
-		// if (p.isDirectInput()) {
-		// 	return color2; // color2 = Colors from sim
-		// } else {
-		// 	return color1; // color1 = Colors from server
-		// }
 	}
 
 	// Draw color from pixel[] structure to the LEDs themselves:

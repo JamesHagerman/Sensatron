@@ -4,6 +4,7 @@ var theParams = {
    'on': true,
    'flashlight': false,
    'mode': 4,
+   'blendMode': 1,
    'hue1': 2,
    'hue2': 3,
    'saturation': 6,
@@ -47,12 +48,18 @@ function lightParamsCallback(settingsJSON) {
 	$('#slider4').val(settings.slider4).change();
   $('#slider5').val(settings.slider5).change();
 	setModeButtonOn(settings.mode);
+	setBlendModeButtonOn(settings.blendMode);
 	allowUpdate = true;
 }
 
 function setModeButtonOn(mode) {
 	$('.mode-button').removeClass("mode-button-on");
 	$('#mode-' + mode).addClass("mode-button-on");
+}
+
+function setBlendModeButtonOn(mode) {
+	$('.blend-mode-button').removeClass("mode-button-on");
+	$('#blend-mode-' + mode).addClass("mode-button-on");
 }
 
   function setHue(event) {
@@ -83,6 +90,13 @@ function setMode(event) {
 	}
 }
 
+function setBlendMode(event) {
+	var mode = $(this).data("blend-mode");
+	if (allowUpdate) {
+		updateLights({blendMode: mode});
+	}
+}
+
 function pressTrigger(event) {
 	var which = $(this).data("trigger");
 	triggerLights(which);
@@ -106,6 +120,7 @@ $(document).ready(function() {
   $('#slider4').change(setSliderValue);
   $('#slider5').change(setSliderValue);
   $('.mode-button').click(setMode);
+  $('.blend-mode-button').click(setBlendMode);
   $('.trigger-button').on("vmousedown", pressTrigger);
   $('#beat').on("vmousedown", function() { updateLights({beat: true}); });
   setInterval(updateLights, 500);

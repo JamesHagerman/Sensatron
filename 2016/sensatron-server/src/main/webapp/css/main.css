@@ -114,6 +114,12 @@ div.ui-slider {
 	bottom: 0;
 }
 
+.blend-mode-button {
+    width: 2.5em;
+    border: .25em solid black;
+    padding: .25em;
+}
+
 .mode-button-on {
 	border-color: white;
 }

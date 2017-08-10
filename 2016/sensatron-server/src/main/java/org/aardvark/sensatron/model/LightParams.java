@@ -8,9 +8,15 @@ public class LightParams implements Cloneable {
 	public static final int MODE_BLOBS = 2;
 	public static final int MODE_FFT = 3;
 
+	public static final int BLEND_MODE_1 = 1;
+	public static final int BLEND_MODE_2 = 2;
+	public static final int BLEND_MODE_3 = 3;
+	public static final int BLEND_MODE_4 = 4;
+
 	private boolean on = true;
 	private boolean flashlight;
 	private int mode = MODE_SPECTRUM;
+	private int blendMode = BLEND_MODE_1;
 	private int hue1 = 0;
 	private int hue2 = 255;
 	private int saturation = 100;
@@ -119,5 +125,13 @@ public class LightParams implements Cloneable {
 
 	public void setDirectInput(boolean directInput) {
 		this.directInput = directInput;
+	}
+
+	public int getBlendMode() {
+		return blendMode;
+	}
+
+	public void setBlendMode(int blendMode) {
+		this.blendMode = blendMode;
 	}
 }
