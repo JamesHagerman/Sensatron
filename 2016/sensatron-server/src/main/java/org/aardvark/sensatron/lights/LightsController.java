@@ -415,7 +415,7 @@ public class LightsController implements Runnable {
 					float rotatedHue = ( goodFFTBuckets[i]/currentPeak ) + rotate;
 
 				  int theColor = Color.HSBtoRGB(rotatedHue, 1.0f, 1.0f);
-					int blended = blend(theColor, pickedColor, (env1Value+(env2Value*-1)+arValue)/255.0f);
+					int blended = tween(theColor, pickedColor, (env1Value+(env2Value*-1)+arValue)/255.0f);
 					setOneLight(i, 0, blended);
 				}
 				return;
@@ -473,6 +473,15 @@ public class LightsController implements Runnable {
 	public int color(int red, int green, int blue) {
 		return red << 16 | green << 8 | blue;
 	}
+	public int red(int color) {
+		return (color & RED) >> 16;
+	}
+	public int green(int color) {
+		return (color & GREEN) >> 8;
+	}
+	public int blue(int color) {
+		return color & BLUE;
+	}
 	public int random(int max) {
 		return (int) (Math.random() * (max + 1));
 	}
@@ -519,7 +528,7 @@ public class LightsController implements Runnable {
 	  }
 	}
 
- 	int blend( int i1, int i2, float ratio ) {
+ 	int tween( int i1, int i2, float ratio ) {
 		int toReturn = 0;
     if ( ratio > 1f ) ratio = 1f;
     else if ( ratio < 0f ) ratio = 0f;
@@ -576,7 +585,7 @@ public class LightsController implements Runnable {
 		for (int strand = 0; strand < STRANDS; strand++) {
 	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
 				int currentValue = lights[strand][lightNum];
-	      lights[strand][lightNum] = blend(currentValue, baseColor, amount);;
+	      lights[strand][lightNum] = tween(currentValue, baseColor, amount);;
 	      lightIndex++;
 	    }
 	  }
@@ -628,20 +637,50 @@ public class LightsController implements Runnable {
 	// Handle blending between art and direct input
 	int blend(int color1, int color2, LightParams p) {
 		int result = color1;
+		int threshold = p.getSlider5() * 2;
+		float[] hsb1 = new float[3];
+		float[] hsb2 = new float[3];
+		Color.RGBtoHSB(red(color1), green(color1), blue(color1), hsb1);
+		Color.RGBtoHSB(red(color2), green(color2), blue(color2), hsb2);
 		switch (p.getBlendMode()) {
 		case LightParams.BLEND_MODE_1:
 			// X-Fade
-			result = blend(color1, color2, p.getSlider5()/100.0f);
+			result = tween(color1, color2, p.getSlider5()/100.0f);
 			break;
 		case LightParams.BLEND_MODE_2:
-			int threshold = p.getSlider5();
-			if ((color2 & RED) < threshold && (color2 & GREEN) < threshold && (color2 & BLUE) < threshold) {
-				result = (int) (color1 * (threshold/255.0));
+			if (hsb2[2] < (threshold / 255f)) {
+				result = Color.HSBtoRGB(hsb1[0], hsb1[1], threshold/255f);
+			} else {
+				result = color2;
 			}
 			break;
 		case LightParams.BLEND_MODE_3:
+			if (hsb2[2] < (threshold / 255f)) {
+				result = color(threshold/4, 0, threshold);
+			} else {
+				result = color2;
+			}
 			break;
 		case LightParams.BLEND_MODE_4:
+			switch (p.getSlider5()/17) {
+			case 0:
+				result = Color.HSBtoRGB(hsb1[0], hsb2[1], hsb2[2]);
+				break;
+			case 1:
+				result = Color.HSBtoRGB(hsb1[0], hsb1[1], hsb2[2]);
+				break;
+			case 2:
+				result = Color.HSBtoRGB(hsb1[0], hsb2[1], hsb1[2]);
+				break;
+			case 3:
+				result = Color.HSBtoRGB(hsb2[0], hsb1[1], hsb2[2]);
+				break;
+			case 4:
+				result = Color.HSBtoRGB(hsb2[0], hsb2[1], hsb1[2]);
+				break;
+			default:
+				result = Color.HSBtoRGB(hsb2[0], hsb1[1], hsb1[2]);
+			}
 			// Hacked Screen blend (results in brighter picture. annnnnd pastel land)
 			// int r = (int)( ~((~r1 & 0xff)*(~r2 & 0xff)) & 0xff );
 	    // int g = (int)( ~((~g1 & 0xff)*(~g2 & 0xff)) & 0xff );

@@ -40,6 +40,7 @@ public class SensatronRestController {
 								@RequestParam(value = "directInput", required = false) Boolean directInput,
 								@RequestParam(value = "beat", required = false) Boolean beat,
 								@RequestParam(value = "mode", required = false) Integer mode,
+								@RequestParam(value = "blendMode", required = false) Integer blendMode,
 								@RequestParam(value = "saturation", required = false) Integer saturation,
 								@RequestParam(value = "slider4", required = false) Integer slider4,
 								@RequestParam(value = "slider5", required = false) Integer slider5,
@@ -84,6 +85,9 @@ public class SensatronRestController {
 		}
 		if (mode != null) {
 			lightParams.setMode(mode);
+		}
+		if (blendMode != null) {
+			lightParams.setBlendMode(blendMode);
 		}
 		if (beat != null) {
 			lightParams.setVirtualBeat(beat);
