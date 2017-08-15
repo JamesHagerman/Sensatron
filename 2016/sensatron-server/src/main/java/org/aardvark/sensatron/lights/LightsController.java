@@ -1,27 +1,23 @@
 package org.aardvark.sensatron.lights;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
-
-import java.awt.Color;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.stream.IntStream;
 
 import org.aardvark.sensatron.model.LightParams;
 import org.apache.log4j.Logger;
 
 import TotalControl.TotalControl;
-import ddf.minim.*;
-import ddf.minim.analysis.*;
-
-// Added by james as a hack for various things:
-import java.io.OutputStream;
-import java.util.*;
-import java.util.stream.*;
-import java.lang.Float.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.io.IOException;
+import ddf.minim.AudioInput;
+import ddf.minim.Minim;
+import ddf.minim.analysis.BeatDetect;
+import ddf.minim.analysis.FFT;
 
 
 public class LightsController implements Runnable {
@@ -522,11 +518,9 @@ public class LightsController implements Runnable {
 	}
 	// These affect the pixels
 	void shiftAllOut() {
-		int lightIndex = 0;
 		for (int strand = STRANDS-1; strand >= 0; strand--) {
 	    for (int lightNum = STRAND_LENGTH-1; lightNum >= 1; lightNum--) {
 	      lights[strand][lightNum] = lights[strand][lightNum-1];
-	      lightIndex++;
 	    }
 	  }
 	}
@@ -554,7 +548,6 @@ public class LightsController implements Runnable {
 	}
 
 	void whitenAll(int amount) {
-		int lightIndex = 0;
 		for (int strand = 0; strand < STRANDS; strand++) {
 	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
 				int currentValue = lights[strand][lightNum];
@@ -578,18 +571,15 @@ public class LightsController implements Runnable {
 				currentValue = color(r, g, b);
 
 	      lights[strand][lightNum] = currentValue;
-	      lightIndex++;
 	    }
 	  }
 	}
 
 	void blendAll(int baseColor, float amount) {
-		int lightIndex = 0;
 		for (int strand = 0; strand < STRANDS; strand++) {
 	    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
 				int currentValue = lights[strand][lightNum];
 	      lights[strand][lightNum] = tween(currentValue, baseColor, amount);;
-	      lightIndex++;
 	    }
 	  }
 	}
@@ -734,6 +724,7 @@ public class LightsController implements Runnable {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	void openSocket() {
 		if (attemptNetworkLights) {
 			log.info("Trying to connect to lights server display...");
