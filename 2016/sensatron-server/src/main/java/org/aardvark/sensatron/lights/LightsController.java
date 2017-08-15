@@ -29,6 +29,7 @@ public class LightsController implements Runnable {
 	public static final int RED   = 0xff0000;
 	public static final int GREEN = 0x00ff00;
 	public static final int BLUE  = 0x0000ff;
+	private static final long DIRECT_INPUT_TIMEOUT_MILLIS = 5000;
 
 	private final Thread renderThread = new Thread(this);
 	public Minim minim;
@@ -90,6 +91,8 @@ public class LightsController implements Runnable {
 	boolean attemptNetworkLights = true;
 	boolean networkLightsConnected = false;
 
+	long lastDirectInputTime;
+	
 	// Some Envelopes:
 	// TODO: Build some curves?
 	// TODO: Build some attack curves?
@@ -459,10 +462,10 @@ public class LightsController implements Runnable {
 	}
 
 	public void setDirectInput(int strand, int lightNum, int c) {
-		  strand = strand%STRANDS;
-		  lightNum = lightNum%STRAND_LENGTH;
-		  directInput[strand][lightNum] = c;
-		}
+	  strand = strand%STRANDS;
+	  lightNum = lightNum%STRAND_LENGTH;
+	  directInput[strand][lightNum] = c;
+	}
 
 	//=============
 	// HELPERS:
@@ -635,52 +638,54 @@ public class LightsController implements Runnable {
 	}
 
 	// Handle blending between art and direct input
-	int blend(int color1, int color2, LightParams p) {
-		int result = color1;
+	int blend(int artColor, int directColor, LightParams p) {
+		int result = artColor;
 		int threshold = p.getSlider5() * 2;
-		float[] hsb1 = new float[3];
-		float[] hsb2 = new float[3];
-		Color.RGBtoHSB(red(color1), green(color1), blue(color1), hsb1);
-		Color.RGBtoHSB(red(color2), green(color2), blue(color2), hsb2);
+		float[] hsbArt = new float[3];
+		float[] hsbDirect = new float[3];
+		Color.RGBtoHSB(red(artColor), green(artColor), blue(artColor), hsbArt);
+		Color.RGBtoHSB(red(directColor), green(directColor), blue(directColor), hsbDirect);
 		switch (p.getBlendMode()) {
 		case LightParams.BLEND_MODE_1:
 			// X-Fade
-			result = tween(color1, color2, p.getSlider5()/100.0f);
+			result = tween(artColor, directColor, p.getSlider5()/100.0f);
 			break;
 		case LightParams.BLEND_MODE_2:
-			if (hsb2[2] < (threshold / 255f)) {
-				result = Color.HSBtoRGB(hsb1[0], hsb1[1], threshold/255f);
+			if (hsbDirect[2] < (threshold / 255f)) {
+				result = Color.HSBtoRGB(hsbArt[0], hsbArt[1], threshold/255f);
 			} else {
-				result = color2;
+				result = directColor;
 			}
 			break;
 		case LightParams.BLEND_MODE_3:
-			if (hsb2[2] < (threshold / 255f)) {
-				result = color(threshold/4, 0, threshold);
+			if (hsbDirect[2] < (threshold / 255f)) {
+				result = Color.HSBtoRGB(p.getHue1()/255f, 1f, threshold/255f);
 			} else {
-				result = color2;
+				result = directColor;
 			}
 			break;
 		case LightParams.BLEND_MODE_4:
 			switch (p.getSlider5()/17) {
 			case 0:
-				result = Color.HSBtoRGB(hsb1[0], hsb2[1], hsb2[2]);
+				result = Color.HSBtoRGB(hsbArt[0], hsbDirect[1], hsbDirect[2]);
 				break;
 			case 1:
-				result = Color.HSBtoRGB(hsb1[0], hsb1[1], hsb2[2]);
+				result = Color.HSBtoRGB(hsbArt[0], hsbArt[1], hsbDirect[2]);
 				break;
 			case 2:
-				result = Color.HSBtoRGB(hsb1[0], hsb2[1], hsb1[2]);
+				result = Color.HSBtoRGB(hsbArt[0], hsbDirect[1], hsbArt[2]);
 				break;
 			case 3:
-				result = Color.HSBtoRGB(hsb2[0], hsb1[1], hsb2[2]);
+				result = Color.HSBtoRGB(hsbDirect[0], hsbArt[1], hsbDirect[2]);
 				break;
 			case 4:
-				result = Color.HSBtoRGB(hsb2[0], hsb2[1], hsb1[2]);
+				result = Color.HSBtoRGB(hsbDirect[0], hsbDirect[1], hsbArt[2]);
 				break;
 			default:
-				result = Color.HSBtoRGB(hsb2[0], hsb1[1], hsb1[2]);
+				result = Color.HSBtoRGB(hsbDirect[0], hsbArt[1], hsbArt[2]);
 			}
+			break;
+		default:
 			// Hacked Screen blend (results in brighter picture. annnnnd pastel land)
 			// int r = (int)( ~((~r1 & 0xff)*(~r2 & 0xff)) & 0xff );
 	    // int g = (int)( ~((~g1 & 0xff)*(~g2 & 0xff)) & 0xff );
@@ -780,6 +785,11 @@ public class LightsController implements Runnable {
 
 
 	public LightParams getParams() {
+		if (lastDirectInputTime < System.currentTimeMillis() - DIRECT_INPUT_TIMEOUT_MILLIS) {
+			params.setDirectInput(false);
+		} else {
+			params.setDirectInput(true);
+		}
 		try {
 			return params.clone();
 		} catch (CloneNotSupportedException e) {
@@ -843,5 +853,8 @@ public class LightsController implements Runnable {
 
 	public int getStrandLength() {
 		return STRAND_LENGTH;
+	}
+	public void updateLastDirectInputTime() {
+		this.lastDirectInputTime = System.currentTimeMillis();
 	}
 }

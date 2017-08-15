@@ -181,6 +181,7 @@ public class SensatronRestController {
 				break;
 			}
 		}
+		lightsController.updateLastDirectInputTime();
 		return "{ response: 'Sensatron ok!'}";
 	}
 

@@ -46,9 +46,14 @@ function lightParamsCallback(settingsJSON) {
 	$('#hue2').val(settings.hue2).change();
 	$('#saturation').val(settings.saturation).change();
 	$('#slider4').val(settings.slider4).change();
-  $('#slider5').val(settings.slider5).change();
+	$('#slider5').val(settings.slider5).change();
 	setModeButtonOn(settings.mode);
 	setBlendModeButtonOn(settings.blendMode);
+	if (settings.directInput) {
+		$('#fluidControlsDiv').show();
+	} else {
+		$('#fluidControlsDiv').hide();
+	}
 	allowUpdate = true;
 }
 
