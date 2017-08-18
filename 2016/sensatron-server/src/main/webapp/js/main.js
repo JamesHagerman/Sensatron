@@ -49,11 +49,11 @@ function lightParamsCallback(settingsJSON) {
 	$('#slider5').val(settings.slider5).change();
 	setModeButtonOn(settings.mode);
 	setBlendModeButtonOn(settings.blendMode);
-	if (settings.directInput) {
-		$('#fluidControlsDiv').show();
-	} else {
-		$('#fluidControlsDiv').hide();
-	}
+//	if (settings.directInput) {
+//		$('#fluidControlsDiv').show();
+//	} else {
+//		$('#fluidControlsDiv').hide();
+//	}
 	allowUpdate = true;
 }
 
