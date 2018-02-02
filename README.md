@@ -2,30 +2,30 @@
 
 This is the repo that will end up being the one-stop-shop for all code related to the Sensatron art car.
 
-## Some notes
+## 2016-Current Code
 
-- Branches will be created for various years
-- Master will be the current year
+This code exists in the `2016/` directory. Look at the `README.md` file in there to figure out how to run it.
 
-## Installing the dev platform
+This version runs on an Intel Nuc minicomputer as a Java web server that hosts a control interface via WiFi. Anyone connected to the wifi can control the car's LEDs. This version is sound reactive.
 
-At some point, we will have some code to actually run... 
+The WiFi Access Point is hosted on the Nuc directly using `hostapd` while `dnsmasq` routes all users connecting to the AP to the Sensatron control interface web site. The Java app is hosted via `jetty` and traffic is routed to it via an `nginx` proxy. 
 
+In 2017, an Android tablet traveled to Playa and ran a fluid simulator that streamed colors to the Sensatron via HTTP connections.
 
-## Installing Processing to Unity launcher:
+## 2014-2015 Code
 
-Add the following content to a new file located at: `/usr/share/applications/processing.desktop`
+Exists in `2014-15-beaglebone-black/` but actually lives in this repo here: (https://github.com/JamesHagerman/BBB-BM-Lights-2015)[https://github.com/JamesHagerman/BBB-BM-Lights-2015]. This ran on the Beaglebone Black touchscreen computer James built. It runs GLSL Shaders to generate colors. Compiling it is a pain. We tried getting audio working in 2015, but Linux audio driver issues and last minute hacks kept that from happening.
 
-```
-[Desktop Entry]
-Version=2.1
-Name=Processing
-Comment=Processing Rocks
-Exec=processing
-Icon=/opt/processing/lib/icons/pde-256.png
-Terminal=false
-Type=Application
-Categories=AudioVideo;Video;Graphics;
-```
+## 2013 Code
 
-And it should (after a few seconds) show up in the launcher.
+Exists in `2013-processing/`. This was just a Processing project that ran on James' laptop on the car the entire night. It had a 9DoF motion sensor locked in a yellow "football" hooked up via bluetooth that people could use to control the lights directly.
+
+This was the first year we used the `p9813` FTDI libary to control the TCL Lights. That library is here: (https://github.com/PaintYourDragon/p9813)[https://github.com/PaintYourDragon/p9813]
+
+## 2012 Code
+
+Exists in `2012-arduino/`. This was an Arduino sketch that ran great with one strand of LEDs but ran out of memory on playa when tested against 600 LEDs. Oops. Memory and Power issues that year were a pain in the butt.
+
+## 2011 and Earlier
+
+James wasn't involved in this work. It was a Processing sketch that interfaced with a different kind of LED pixels. Not sure if this code works at all anymore. It was sound reactive.
