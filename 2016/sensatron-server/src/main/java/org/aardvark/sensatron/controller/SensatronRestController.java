@@ -168,16 +168,20 @@ public class SensatronRestController {
 		int strand = numStrands - 1;
 		int light = 0;
 		byte[] decoded = Base64.getDecoder().decode(req.getLightProbeData().trim());
-		// logger.debug("data length: " + decoded.length + " pixel count: " + decoded.length/3 + " num lights: " + numLights + " num strands: " + numStrands);
+//		logger.debug("data length: " + decoded.length + " pixel count: " + decoded.length/3 + " num lights: " + numLights + " num strands: " + numStrands + " decoded: " + decoded[0]);
+//		logger.debug("red: " + (decoded[0] & 0xff) + " green: " + (decoded[1] & 0xff) + " blue: " + (decoded[2] & 0xff));
 		for (int i = 0; i < decoded.length - 2; i += 3) {
-			lightsController.setDirectInput(strand, light, lightsController.color(decoded[i], decoded[i+1], decoded[i+2]));
+			// VERY IMPORTANT NOTE:
+			// On the next line, we need to convert the "signed" byte to an "unsigned value". We do this with bit math:
+			lightsController.setDirectInput(strand, light, lightsController.color(decoded[i] & 0xff, decoded[i+1] & 0xff, decoded[i+2] & 0xff));
 			light++;
 			if (light >= numLights) {
 				light = 0;
 				strand--;
 			}
 			if (strand < 0) { // strand starts at numStrands-1 and counts down
-				logger.warn("Color data longer than expected: " + decoded.length);
+				// Really, we don't care about anything more than the number of pixels we need data for...
+//				logger.warn("Color data longer than expected: " + decoded.length + " index: " + i + " last byte: " + (i+3));
 				break;
 			}
 		}
