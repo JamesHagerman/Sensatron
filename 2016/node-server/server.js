@@ -23,6 +23,11 @@ var io = require('socket.io')(server);
 // Share the public directory:
 app.use(express.static(__dirname + '/public'));
 
+app.put('/lights', function(req, res) {
+	console.log('request received! Sending keep alive response');
+	res.status(200).send({ response: 'Sensatron ok!'});
+})
+
 app.get('/currentAnimation/:id', function (req, res) {
 	var currentAnimation = req.params.id;
 	// switchAnimation(currentAnimation);
@@ -92,12 +97,13 @@ io.on('connection', function (socket) {
 //============================
 // Start of Raw Color Client:
 
-var net = require('net');
-var rawColorClient = new net.Socket();
-var rawColorClientConnected = false;
-var bufferSize = 600*3;
-var buf = new Buffer(bufferSize, 'binary');
-// const buf1 = Buffer.alloc(10); // DOES NOT WORK ON 4.4.7
+// DISABLED FOR 2017 TEST:
+// var net = require('net');
+// var rawColorClient = new net.Socket();
+// var rawColorClientConnected = false;
+// var bufferSize = 600*3;
+// var buf = new Buffer(bufferSize, 'binary');
+// // const buf1 = Buffer.alloc(10); // DOES NOT WORK ON 4.4.7
 
 function connectToRawColorServer() {
 	if (!rawColorClientConnected) {
