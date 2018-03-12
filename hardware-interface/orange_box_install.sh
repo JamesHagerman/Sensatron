@@ -1,15 +1,25 @@
 #!/bin/bash
 
-# These are for the x86_64 version:
-#
 # Install the binary library:
+#
+# These are for x86_64:
+# echo
+# echo "Installing the FTDI binary library..."
+# sudo cp FTDI_Hack/release/build/x86_64/lib* /usr/local/lib/
+# sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.1.12
+# sudo ln -sf /usr/local/lib/libftd2xx.so.1.1.12 /usr/local/lib/libftd2xx.so
+# echo "Done installing FTDI binary library."
+# ls -al /usr/local/lib/ | grep ftd
+
+# These are for ARM HF:
 echo
 echo "Installing the FTDI binary library..."
-sudo cp FTDI_Hack/release/build/x86_64/lib* /usr/local/lib/
-sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.1.12
-sudo ln -sf /usr/local/lib/libftd2xx.so.1.1.12 /usr/local/lib/libftd2xx.so
+sudo cp FTDI_Hack/release/build/arm926-hf/lib* /usr/local/lib/
+sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.2.7
+sudo ln -sf /usr/local/lib/libftd2xx.so.1.2.7 /usr/local/lib/libftd2xx.so
 echo "Done installing FTDI binary library."
 ls -al /usr/local/lib/ | grep ftd
+
 # Install the library header files:
 echo
 echo "Installing the FTDI header files..."

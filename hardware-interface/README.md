@@ -4,6 +4,28 @@ This directory holds all of the stuff needed to send power and LED control signa
 
 It's also supposed to be where I document how the power board works.
 
+## Install directions
+
+Each OS/Architecture uses a different version of this silly FTDI driver. The `orange_box_install.sh` script should help explain how to install the FTDI drivers and other stuff.
+
+... Check it before you run it...
+
+### x86_64 Linux
+
+The Intel Nuc and x86_64 Ubuntu development machines.
+
+### ARM
+
+Either Hard Float or Soft Float. Check with `dpkg --print-architecture`
+
+#### HF
+
+The Raspberry Pi 3 is Hard Float. 
+
+#### SF
+
+I think the BBB was using this at some point...?
+
 ## Historical name
 
 Because this thing started off it's life living in a plastic, orange tool box, that's what I called it for a while.
