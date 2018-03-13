@@ -78,6 +78,7 @@ sudo raspi-config
 
 >```
 >2. Network Options:
+>    -> Set up WiFi (SSID and Passphrase... Temporary; We need internet)
 >    -> Enable predictible network interface names
 >4. Localization Options:
 >    -> Change Keyboard Layout: 
@@ -96,10 +97,10 @@ sudo raspi-config
 >    -> Update the raspi-config just in case... If nothing else, a wifi test!
 >```
 
-### Update Aptitude
+### Update Aptitude and Upgrade the system
 
 ```
-sudo apt-get update
+sudo apt update && sudo apt upgrade
 ```
 
 ### Install the obvious stuff
@@ -124,7 +125,19 @@ cd wiringPi
 ./build
 ```
 
+### Remove any wifi settings
+
+They are somewhere in `/etc/wpa_supplicant`
+
+### Shutdown and clear history
+
+```
+sudo shutdown -h now & history -c
+```
+
 ### Create an image of the configured install
+
+*NOTE: Make sure you removed your WiFi credentials!*
 
 ```
 sudo dd bs=4M if=/dev/sdb of=rpi-configured.img status=progress conv=fsync
@@ -137,7 +150,7 @@ You should now have a nice, configured `rpi-configured.img` file that can be mod
 
 Now to the actual WORK part of this: Getting it to do something useful.
 
-### Run `raspi-config` and set up the network:
+### Run `raspi-config` and configure most of the settings:
 
 ```
 sudo raspi-config
@@ -145,7 +158,7 @@ sudo raspi-config
 
 >```
 >2. Network Options:
->    -> Set a Hostname (sensatron-pi)
+>    -> Set a hostname
 >    -> Set up WiFi (SSID and Passphrase... Temporary; We need internet)
 >```
 

@@ -34,6 +34,12 @@ pushd p9813/
 make clean
 sudo make
 sudo make install
+
+echo "Adding udev rule to allow access to FTDI device"
+sudo cp ftdi.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+echo "Done installing udev rules"
+
 popd
 echo "Done building and installing the p9813 FTDI driver."
 
@@ -56,7 +62,7 @@ echo "Done installing the native TotalControl library"
 echo
 echo "Setting LD_LIBRARY_PATH..."
 export LD_LIBRARY_PATH="/usr/local/lib/"
-echo "You should probably add the following to .profile:"
+echo "You NEED to add the following to ~/.profile so you can build anything...:"
 echo "export LD_LIBRARY_PATH=\"/usr/local/lib/\""
 
 echo
