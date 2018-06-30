@@ -94,3 +94,16 @@ They'd all become fair game.
 And that's good!
 
 
+## TCL Pinout
+
+I can never seem to find this so I am putting it here again...
+
+Looking at female threaded output, with referencing tab pointing up, the pins are as follows:
+
+```
+Female threads, female pin sockets, male connector:
+    |
+GND   SCK
+
+MOSI  5v
+```
