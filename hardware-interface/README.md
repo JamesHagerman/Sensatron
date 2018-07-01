@@ -93,6 +93,48 @@ They'd all become fair game.
 
 And that's good!
 
+### Ditch the Intel Nuc
+
+They are REALLY expensive and are really not that much better than other, cheaper options.
+
+1. Raspberry Pi 3 or Zero W
+2. STM32 based embedded chip with some amount of wifi hardware
+3. ESP32 based system, the Particle Argon
+
+At this point, I think the best option is to have a Pi be the main controller and the wireless AP. Any other WiFi based device can add on from there.
+
+### Handle Power correctly!
+
+These big power supplies still sag with this many LEDs. Any system is going to have to handle power sag at some point if it is powered from the same supply as the LEDs.
+
+Our next iteration should include overvolt protection just in case...
+
+We should also be able to use multiple power sources:
+
+1. Screw terminals
+2. LiPo header (if we can get it SAFE and rechargable...)
+3. 18650s????
+4. Barrel connector
+
+### Somewhat universal!
+
+If we can build one board, that handles Power input, LED output, and level shifting usinng the 74VHCT125 buffer IC, than we should try to make it work with multiple devices.
+
+1. Raspberry Pi hat (for both the full sized pi and the zero)
+2. Feather board pinout (both the STM32 chip like is what adafruit uses on their "pxl8" hat AND the new Particle boards)
+3. MAYBE direct USB access using some onboard USB chip (probably not FTDI, but maybe both?)
+4. Just wiring it up on a breadboard
+
+### Support receiving color data DIRECTLY from HTTP clients
+
+We should really just expose a RESTful or WebSocket based API to get color to the lights. This opens the doors to ANYone writing led projects as long as they can write a simple client.
+
+### Suppoort Multipe LED driver devices at a time/Mesh
+
+We have colors on the Sensatron, and Luminus... why not also everywhere else?
+
+If nothing else, perhaps all interface APIs should include a device ID... and how would the breakout board allow people to change that id??
+ 
 
 ## TCL Pinout
 
