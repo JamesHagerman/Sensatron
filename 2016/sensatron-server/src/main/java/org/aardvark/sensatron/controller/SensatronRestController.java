@@ -173,7 +173,7 @@ public class SensatronRestController {
 		for (int i = 0; i < decoded.length - 2; i += 3) {
 			// VERY IMPORTANT NOTE:
 			// On the next line, we need to convert the "signed" byte to an "unsigned value". We do this with bit math:
-			lightsController.setDirectInput(strand, light, lightsController.color(decoded[i] & 0xff, decoded[i+1] & 0xff, decoded[i+2] & 0xff));
+			lightsController.setDirectInput(numStrands-strand, light, lightsController.color(decoded[i] & 0xff, decoded[i+1] & 0xff, decoded[i+2] & 0xff));
 			light++;
 			if (light >= numLights) {
 				light = 0;

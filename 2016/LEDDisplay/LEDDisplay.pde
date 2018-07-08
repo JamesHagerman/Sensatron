@@ -1,6 +1,6 @@
 // Car Lighting layout:
-int STRANDS = 12; // Number of physical wands
-int STRAND_LENGTH = 50; // Number of lights per strand
+int STRANDS = 1; // Number of physical wands
+int STRAND_LENGTH = 600; // Number of lights per strand
 int LED_COUNT = STRANDS * STRAND_LENGTH; // Total number of lights
 
 // TCL Variables:
@@ -22,7 +22,7 @@ int SPACING = 5;
 
 void setup()
 {
-  size(800, 600, P3D); // make it a little smaller...
+  size(1024, 600, P3D); // make it a little smaller...
   frameRate(60);
 
   // Start the Raw Color Server:
@@ -34,7 +34,7 @@ void setup()
   buildRemapArray();
 
   // Build the visualizer:
-  lightDisplay = createGraphics(800, 600, P3D);
+  lightDisplay = createGraphics(1024, 600, P3D);
   lightDisplay.smooth();
   lightDisplay.lights();
 }
@@ -104,39 +104,66 @@ void mapLightsToDrawing() {
 
 // A method for actually drawing the lights:
 void drawLights() {
-  int centerX = lightDisplay.width/2;
-  int centerY = lightDisplay.height/2;
-
   lightDisplay.beginDraw();
   lightDisplay.background(100);
   lightDisplay.pushMatrix();
-  //  rotateZ(radians(180));
-  lightDisplay.translate(0, 0, -100);
-  // lightDisplay.rotateX(radians(45));
-
+  
+  int derp = 0;
   for (int strand = 0; strand < STRANDS; strand++) {
-    double theta = strand * dRad - (PI/2) + PI;
     for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+      derp+=1;
       int c = lights[strand][lightNum];
-//      c = 255;
+      //c = 255;
       lightDisplay.fill(c);
-     noStroke();
-      int y = (int) ((lightNum+3) * SPACING * Math.sin(theta));
-      int x = (int) ((lightNum+3) * SPACING * Math.cos(theta));
-      x = centerX - x;
-      y = centerY - y;
-      lightDisplay.ellipse(x, y, 5, 5);
+      lightDisplay.noStroke();
+      int y = strand*2;
+      int x = lightNum*2;
+      lightDisplay.ellipse(x+10, y+10, 5, 5);
     }
-    // Draw the wand labels
-    lightDisplay.fill(255);
-    int y = (int) ((STRAND_LENGTH+3) * SPACING * Math.sin(theta));
-    int x = (int) ((STRAND_LENGTH+3) * SPACING * Math.cos(theta));
-    x = centerX - x;
-    y = centerY - y;
-    lightDisplay.text(strand, x, y, 10);
+
   }
 
   lightDisplay.popMatrix();
   lightDisplay.endDraw();
   image(lightDisplay, 0, 0);
 }
+
+
+// A method for actually drawing the lights:
+//void drawLights() {
+//  int centerX = lightDisplay.width/2;
+//  int centerY = lightDisplay.height/2;
+
+//  lightDisplay.beginDraw();
+//  lightDisplay.background(100);
+//  lightDisplay.pushMatrix();
+//  //  rotateZ(radians(180));
+//  lightDisplay.translate(0, 0, -100);
+//  // lightDisplay.rotateX(radians(45));
+
+//  for (int strand = 0; strand < STRANDS; strand++) {
+//    double theta = strand * dRad - (PI/2) + PI;
+//    for (int lightNum = 0; lightNum < STRAND_LENGTH; lightNum++) {
+//      int c = lights[strand][lightNum];
+////      c = 255;
+//      lightDisplay.fill(c);
+//     noStroke();
+//      int y = (int) ((lightNum+3) * SPACING * Math.sin(theta));
+//      int x = (int) ((lightNum+3) * SPACING * Math.cos(theta));
+//      x = centerX - x;
+//      y = centerY - y;
+//      lightDisplay.ellipse(x, y, 5, 5);
+//    }
+//    // Draw the wand labels
+//    lightDisplay.fill(255);
+//    int y = (int) ((STRAND_LENGTH+3) * SPACING * Math.sin(theta));
+//    int x = (int) ((STRAND_LENGTH+3) * SPACING * Math.cos(theta));
+//    x = centerX - x;
+//    y = centerY - y;
+//    lightDisplay.text(strand, x, y, 10);
+//  }
+
+//  lightDisplay.popMatrix();
+//  lightDisplay.endDraw();
+//  image(lightDisplay, 0, 0);
+//}

@@ -401,9 +401,12 @@ public class LightsController implements Runnable {
 		switch (p.getMode()) {
 			case LightParams.MODE_SPECTRUM:
 				spectrumDisplay.update(p);
+				int derp = 0;
 				for (int strand = 0; strand < STRANDS; strand++) {
 					for (int light = 0; light < STRAND_LENGTH; light++) {
-						setOneLight(strand, light, spectrumDisplay.getColor(strand, light));
+						derp+=1;
+//						setOneLight(strand, light, Color.HSBtoRGB(derp/300f, 1f, 1f));
+						setOneLight(strand, light, spectrumDisplay.getColor(0, derp));
 					}
 				}
 				return;
@@ -453,6 +456,15 @@ public class LightsController implements Runnable {
 				// int theColor = Color.HSBtoRGB(0/255.0f, 1.0f, 1.0f);
 				// setOneRing(currentLED, theColor);
 
+				return;
+			default:
+				setAllLights(color(0,0,0));
+				setOneLight(0, 0, color(255,0,0));
+				setOneLight(1, 0, color(0,255,0));
+				setOneLight(1, 49, color(0,255,0));
+				setOneLight(5, 49, color(0,0,255));
+
+				setOneStrand(2, color(255,255,255));
 				return;
 		}
 	}
@@ -648,11 +660,12 @@ public class LightsController implements Runnable {
 			}
 			break;
 		case LightParams.BLEND_MODE_3:
-			if (hsbDirect[2] < (threshold / 255f)) {
-				result = Color.HSBtoRGB(p.getHue1()/255f, 1f, threshold/255f);
-			} else {
-				result = directColor;
-			}
+//			if (hsbDirect[2] < (threshold / 255f)) {
+//				result = Color.HSBtoRGB(p.getHue1()/255f, 1f, threshold/255f);
+//			} else {
+//				result = directColor;
+//			}
+			result = directColor;
 			break;
 		case LightParams.BLEND_MODE_4:
 			switch (p.getSlider5()/17) {
@@ -729,14 +742,15 @@ public class LightsController implements Runnable {
 		if (attemptNetworkLights) {
 			log.info("Trying to connect to lights server display...");
 			try	{
-	      Socket socket = new Socket("127.0.0.1", 3001);
-				socketOut = socket.getOutputStream();
-	    }
-	    catch(IOException ex){
-	      log.error("Could not connect to the server!");
-				networkLightsConnected = false;
-				return;
-	    }
+			    Socket socket = new Socket("127.0.0.1", 3001); // Localhost (LEDDisplay running in Processing on Nuc)
+//				Socket socket = new Socket("192.168.1.110", 3001); // Rasbperry Pi Color Server
+                socketOut = socket.getOutputStream();
+			}
+			catch(IOException ex){
+			  log.error("Could not connect to the server!");
+					networkLightsConnected = false;
+					return;
+			}
 			networkLightsConnected = true;
 		} else {
 			log.info("Not trying to connect to lights server display...");
@@ -755,6 +769,7 @@ public class LightsController implements Runnable {
 
 	}
 	void socketLEDs(){
+		// THIS DOES NOT USE THE REMAP FUNCTION!!
 		if (networkLightsConnected) {
 			try	{
 				int j = 0;
