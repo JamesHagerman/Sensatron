@@ -93,6 +93,9 @@ sudo raspi-config
 >        -> Yes
 >    -> P4 SPI (SPI should have already been enabled... but just check!)
 >        -> Yes
+>7. Advanced Options
+>   -> Memory Split
+>        -> 256 (If you're doing any graphics ON HDMI)
 >8. Update
 >    -> Update the raspi-config just in case... If nothing else, a wifi test!
 >```
@@ -232,6 +235,13 @@ git clone git@github.com:PaintYourDragon/p9813.git
 sudo dd bs=4M if=/dev/sdb of=sensatron-color-server.img status=progress conv=fsync
 truncate --reference 2017-11-29-raspbian-stretch-lite.img sensatron-color-server.img
 ```
+
+### Flash your nice new card image:
+
+```
+sudo dd bs=4M if=sensatron-color-server.img of=/dev/sdb status=progress conv=fsync
+```
+
 
 ## How to clone an SD card to a `.img` file:
 
