@@ -1,2 +1,4 @@
-orange_box/FTDI_Hack/
 */.DS_Store
+hardware-interface/FTDI_Hack/
+hardware-interface/p9813/
+.vscode/

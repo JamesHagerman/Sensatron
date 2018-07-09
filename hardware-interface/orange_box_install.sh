@@ -1,15 +1,25 @@
 #!/bin/bash
 
-# These are for the x86_64 version:
-#
 # Install the binary library:
+#
+# These are for x86_64:
+# echo
+# echo "Installing the FTDI binary library..."
+# sudo cp FTDI_Hack/release/build/x86_64/lib* /usr/local/lib/
+# sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.1.12
+# sudo ln -sf /usr/local/lib/libftd2xx.so.1.1.12 /usr/local/lib/libftd2xx.so
+# echo "Done installing FTDI binary library."
+# ls -al /usr/local/lib/ | grep ftd
+
+# These are for ARM HF:
 echo
 echo "Installing the FTDI binary library..."
-sudo cp FTDI_Hack/release/build/x86_64/lib* /usr/local/lib/
-sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.1.12
-sudo ln -sf /usr/local/lib/libftd2xx.so.1.1.12 /usr/local/lib/libftd2xx.so
+sudo cp FTDI_Hack/release/build/arm926-hf/lib* /usr/local/lib/
+sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.2.7
+sudo ln -sf /usr/local/lib/libftd2xx.so.1.2.7 /usr/local/lib/libftd2xx.so
 echo "Done installing FTDI binary library."
 ls -al /usr/local/lib/ | grep ftd
+
 # Install the library header files:
 echo
 echo "Installing the FTDI header files..."
@@ -24,6 +34,12 @@ pushd p9813/
 make clean
 sudo make
 sudo make install
+
+echo "Adding udev rule to allow access to FTDI device"
+sudo cp ftdi.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+echo "Done installing udev rules"
+
 popd
 echo "Done building and installing the p9813 FTDI driver."
 
@@ -46,7 +62,7 @@ echo "Done installing the native TotalControl library"
 echo
 echo "Setting LD_LIBRARY_PATH..."
 export LD_LIBRARY_PATH="/usr/local/lib/"
-echo "You should probably add the following to .profile:"
+echo "You NEED to add the following to ~/.profile so you can build anything...:"
 echo "export LD_LIBRARY_PATH=\"/usr/local/lib/\""
 
 echo
