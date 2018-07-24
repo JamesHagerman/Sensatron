@@ -203,6 +203,23 @@ git clone git@github.com:JamesHagerman/BBB-BM-Lights-2015.git
  sudo apt-get update && sudo apt-get install default-jdk
 ```
 
+*Note: When you get some stupid error about a missing server something*:
+
+```
+$cd /usr/lib/jvm/java-8-openjdk-armhf/jre/lib/arm
+$sudo ln -s client server
+```
+
+Then redo the install...
+
+Then check `java -version`
+
+Then get maven:
+
+```
+sudo apt-get install maven
+```
+
 #### FTDI and P9813, drivers and libraries
 
 Install the FTDI driver, build the p9813 C library, build the p9813 Java library, and install the libraries
