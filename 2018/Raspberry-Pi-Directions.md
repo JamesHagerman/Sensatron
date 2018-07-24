@@ -246,6 +246,10 @@ sudo dd bs=4M if=sensatron-color-server.img of=/dev/sdb status=progress conv=fsy
 
 Between Java being huge and needing to have a third partition for software updates, it's a good idea to have better control over the size of our images.
 
+### Correct way of cloing JUST enough of an SD card
+
+We don't really want a bunch of fluff. So we should just clone what we need: The partitions themselves. Luckily, `fdisk` and `dd` work great for this:
+
 This is what `fdisk -l` spit out for the img file itself:
 
 ```
@@ -300,6 +304,79 @@ Device                              Boot Start     End Sectors  Size Id Type
 sensatron-color-server-v2-test.img1       8192   93236   85045 41.5M  c W95 FAT32 (LBA)
 sensatron-color-server-v2-test.img2      94208 3629055 3534848  1.7G 83 Linux
 ```
+
+### How to add "disk" to an image
+
+That's great, and we could probably then load this `.img` file into gparted (via loopback) and shrink things, but if we need to expand the image, we need to use `truncate` or `dd`. In this case, we don't care about actually HAVING data in the img. We just want a "sparse" file that pretends to be larger than it is. That's what truncate spits ou:
+
+```
+% sudo truncate -s +512 sensatron-color-server-v2-test.img
+% fdisk -l sensatron-color-server-v2-test.img 
+Disk sensatron-color-server-v2-test.img: 1.7 GiB, 1858076672 bytes, 3629056 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x37665771
+
+Device                              Boot Start     End Sectors  Size Id Type
+sensatron-color-server-v2-test.img1       8192   93236   85045 41.5M  c W95 FAT32 (LBA)
+sensatron-color-server-v2-test.img2      94208 3629055 3534848  1.7G 83 Linux
+```
+
+Annnnnd we're back to our original `sensatron-color-server-v2.img` file that we flashed to the SD card in the first place - at least in size. That last 512 bytes is actually empty.
+
+We can add 512MB of space to the img (which should be enough for Java...) using:
+
+```
+sudo truncate -s +512MB sensatron-color-server-v2-test.img
+```
+
+### How to mount an `.img` file as a loop back device
+
+You don't, exactly. It's really a two step process. You have to update the partition table, AND you have to update the file system on the partition.
+
+For both operations, it's easier to use a real disk manipulation tool. You can tell `gparted` to attach to a loop device explicitly. And `resize2fs` and `fdisk` will work against loop devices as well, so we have all the tools we need!
+
+The order of operations will depend on if you're shrinking or expanding your partitions. Shrinking means modify the partition THEN the table... expanding means modify the table THEN grow the partition!
+
+If you mess up or are done with whatever the loop device is, undo it with:
+
+```
+sudo losetup -d /dev/loop0
+```
+
+Oh, and you had better be working with backups...
+
+#### Mount the partition as a loop and modify it
+
+We will use the output of `fdisk -l` again to determine what sector our partition starts on to point the loopback at the start of the position
+
+```
+sudo losetup /dev/loop0 sensatron-color-server-v2-test.img -o $((94208*512))
+sudo gparted /dev/loop0
+```
+
+Now, you can either try using `gparted` to manipulate that partition, or try using `resize2fs` to allow the existing partition to fill the new space:
+
+```
+sudo resize2fs -f /dev/loop0
+```
+
+### Mount the whole image and modify the partition table itself
+
+Now we mount the entire image as a loop device, and start editing the partition table with `fdisk`:
+
+```
+sudo losetup /dev/loop0 sensatron-color-server-v3-expanded.img
+sudo fdisk /dev/loop0
+```
+
+The GOAL is to LEAVE THE PARTITION WHERE IT IS! This means leave the start position the same, and just move the end to match whatever you've done.
+
+So, write down the start sector, delete the partition, recreate it AT THE SAME STARTING SECTOR, then change the ending sector to make sense.
+
+Write those changes, and unmount the loop back. You should be good!
 
 
 ## How to clone an SD card to a `.img` file:
