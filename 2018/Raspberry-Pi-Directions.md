@@ -242,6 +242,65 @@ truncate --reference 2017-11-29-raspbian-stretch-lite.img sensatron-color-server
 sudo dd bs=4M if=sensatron-color-server.img of=/dev/sdb status=progress conv=fsync
 ```
 
+## Managing image size
+
+Between Java being huge and needing to have a third partition for software updates, it's a good idea to have better control over the size of our images.
+
+This is what `fdisk -l` spit out for the img file itself:
+
+```
+fdisk -l sensatron-color-server-v2.img
+Disk sensatron-color-server-v2.img: 1.7 GiB, 1858076672 bytes, 3629056 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x37665771
+
+Device                         Boot Start     End Sectors  Size Id Type
+sensatron-color-server-v2.img1       8192   93236   85045 41.5M  c W95 FAT32 (LBA)
+sensatron-color-server-v2.img2      94208 3629055 3534848  1.7G 83 Linux
+```
+
+After flashing that to the SD card, we can use `fdisk -l` to determine the sector size of what is now on the SD card:
+
+```
+$ fdisk -l /dev/sdb
+sudo fdisk -l /dev/sdb
+Disk /dev/sdb: 29.8 GiB, 32010928128 bytes, 62521344 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x37665771
+
+Device     Boot Start     End Sectors  Size Id Type
+/dev/sdb1        8192   93236   85045 41.5M  c W95 FAT32 (LBA)
+/dev/sdb2       94208 3629055 3534848  1.7G 83 Linux
+```
+
+Since it's 512, you then know how to tell `dd` exactly what you're trying to clone. In this case, we're trying to copy until the end of the disk... i.e. the last partition:
+
+```
+sudo dd if=/dev/sdb of=sensatron-color-server-v2-test.img bs=512 count=3629055 status=progress conv=fsync
+```
+
+Running that will give us an sd card image that looks very much like the original image. In this case though, the original image had one extra 512 byte sector in it... that was apparently not a part of the second partition...
+
+```
+fdisk -l sensatron-color-server-v2-test.img 
+Disk sensatron-color-server-v2-test.img: 1.7 GiB, 1858076160 bytes, 3629055 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x37665771
+
+Device                              Boot Start     End Sectors  Size Id Type
+sensatron-color-server-v2-test.img1       8192   93236   85045 41.5M  c W95 FAT32 (LBA)
+sensatron-color-server-v2-test.img2      94208 3629055 3534848  1.7G 83 Linux
+```
+
 
 ## How to clone an SD card to a `.img` file:
 
