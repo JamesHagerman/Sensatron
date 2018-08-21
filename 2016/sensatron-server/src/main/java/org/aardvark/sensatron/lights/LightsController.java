@@ -208,14 +208,26 @@ public class LightsController implements Runnable {
 		log.info("SETUP!");
 		try {
 			minim = new Minim(this);
-		  in = minim.getLineIn(Minim.STEREO, bufferSize);
-		  in.enableMonitoring();
+		  	in = minim.getLineIn(Minim.STEREO, bufferSize);
+		} catch (Exception e) {
+			log.error("Couldn't open stereo audio: " + e);
+		}
+		  	if (in == null) {
+				log.info("No Stereo Line Input found. Trying Mono...");
+				in = minim.getLineIn(Minim.MONO, bufferSize);
+			}
+			if (in == null) {
+				log.info("Oops! No audio device found! This is not going to be fun...");
+			} else {
+				log.info("Found a good audio line in to use!");
+			}
+		 	in.enableMonitoring();
 			fft = new FFT( in.bufferSize(), in.sampleRate() );
-		  beat = new BeatDetect(in.bufferSize(), in.sampleRate());
-		  beat.detectMode(BeatDetect.SOUND_ENERGY);
-		  fftLog = new FFT( in.bufferSize(), in.sampleRate() );
+		  	beat = new BeatDetect(in.bufferSize(), in.sampleRate());
+		  	beat.detectMode(BeatDetect.SOUND_ENERGY);
+		  	fftLog = new FFT( in.bufferSize(), in.sampleRate() );
 
-		  fftLog.logAverages( 10, 8 );
+		  	fftLog.logAverages( 10, 8 );
 			log.info("fftLog.avgSize(): " + fftLog.avgSize());
 
 			// Redefine our peaks array:
@@ -227,9 +239,6 @@ public class LightsController implements Runnable {
 				log.info("Audio should be monitoring...");
 			}
 
-		} catch(Exception e) {
-			log.error("Couldn't open audio? " + e);
-		}
 
 		spectrumDisplay = new SpectrumDisplay(beat);
 
@@ -729,7 +738,7 @@ public class LightsController implements Runnable {
 		if (attemptNetworkLights) {
 			log.info("Trying to connect to lights server display...");
 			try	{
-	      Socket socket = new Socket("127.0.0.1", 3001);
+	      Socket socket = new Socket("192.168.1.210", 3001);
 				socketOut = socket.getOutputStream();
 	    }
 	    catch(IOException ex){
