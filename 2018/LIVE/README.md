@@ -48,6 +48,31 @@ The brains are the same in these ways:
 2. They should *ALL* be shut down cleanly via the "Shutdown" button in the `/admin.html` page. You risk corrupting the drives otherwise
 3. *THE BRAINS SHOULD BE POWERED ON BEFORE THE LASAGNATRONS!* Weird shit may happen otherwise...
 
+## Hooking up Raspberry Pi's:
+
+1. Plug USB Sound card into the Pi
+2. Plug a USB extension into the Pi
+3. Plug a micro USB cable into the 25-whatever foot USB extention
+4. Plug the small end of this micro USB cable into the Lasagnatron you're using for this rig
+5. Plug the TCL extensions into pigtails 1-6 of the Lasagnatron
+6. Plug the Barrel Jack Power Extenions into the available pigtails on the Lasagnatron
+7. Plug the TCL Tee's into the ends of each of the Barrel Jack Power Extensions
+8. Plug the Lights into the Lasagnatron and the Power, into the tee's, then a second TCL strand off each tee. (Spokes Clockwise From Space, #1 is Unicorn Horn/Front of car)
+9. Plug *THE SECOND* micro USB cable into the Apple 12W power brick
+10. Plug the Apple Power brick into AC power
+11. Plug the small end of *THE SECOND* micro USB cable into the Raspberry Pi and wait for it to boot
+12. Plug the Lasagnatron into AC power
+13. Cross fingers
+14. Airplane mode on Tablets and Phones
+15. Connect to Correct WiFi Access Point
+16. Open browser
+17. Go to a previously un-visited url (sensi.com, pnf.com, something.com, anotherifnotworking.com)
+18. Check UI is working
+19. Deal with audio cables
+20. `/admin.html` -> shutdown button at end of night, plz
+21. wait until no green lights from inside Raspberry Pi case
+22. Unplug ALL AC JACKS!
+
 ## About the SD Card
 
 Plugging the SD card into another computer should provides access to a partition on the SD card named "CODE". It contains three things:
