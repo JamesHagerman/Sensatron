@@ -149,3 +149,29 @@ GND   SCK
 
 MOSI  5v
 ```
+
+On the chinese TCL connectors I have, thats:
+
+
+```
+Female threads, female pin sockets, male connector:
+    |
+BLUE   YELLOW
+
+GREEN  RED
+```
+
+On the 2018 ZenPirate Lasagnatron, thats:
+
+```
+gryb  gryb  gryb  gryb(This last one shouldn't be connected anyways!)
+
+5v
+gnd
+                    USB
+5v
+gnd
+
+gryb  gryb  gryb  gryb
+
+```
